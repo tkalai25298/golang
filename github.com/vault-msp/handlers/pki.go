@@ -4,18 +4,19 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"fmt"
-	"bytes"
 	"encoding/json"
+
+	"github.com/vault-msp/httpreq"
 )
 
 //Pki struct for request params body
 type Pki struct {
 	Path string `json:"path"`
-	Data Data `json:"data"`
+	Data PkiData `json:"data"`
 }
-//Data struct for request params with data to be passed for vault
-type Data struct {
+
+//PkiData struct for request params with data to be passed for vault
+type PkiData struct {
 	Type string `json:"type"`
 	Config Config `json:"config"`
 	SealWrap bool `json:"seal_wrap"`
@@ -47,22 +48,17 @@ func EnablePKI(rw http.ResponseWriter,r *http.Request){
 	vaultData,err := json.Marshal(pki.Data)
 	log.Printf("%v",vaultData)
 
-	client := &http.Client{}
-
-		// auth := "Bearer "+"myroot"
-		res, _ := http.NewRequest("POST","http://localhost:8200/v1/sys/mounts/"+pki.Path,bytes.NewBuffer(vaultData))
-		res.Header.Add("X-Vault-Token","myroot")
-
-		resp, err := client.Do(res)
+		reqObj := httpreq.CreateRequest("POST","http://localhost:8200/v1/sys/mounts/"+pki.Path,"myroot",vaultData)
+		resp, err := reqObj.HTTPCall()
 
 		if err != nil {
-			log.Fatal("pki creation error !")
+			log.Fatal("could not send request! Server connection issue")
 		}
-		fmt.Print(resp.Body)
+		log.Println("The Status Response ==>> ",resp.StatusCode)
 
+		if resp.StatusCode != 204 {
+			log.Panicf("NON 204 STATUS CODE")
+		}
+
+		defer resp.Body.Close()
 }
-
-// func (pki *Pki) Decoder(r io.Reader) error {
-// 	e := json.NewDecoder(r)
-// 	return e.Decode(pki)
-// }

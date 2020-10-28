@@ -11,3 +11,5 @@
 4. checking the input body payload to be a struct check
 
 5. giving static values to struct values
+
+6. common req body struct for all req
