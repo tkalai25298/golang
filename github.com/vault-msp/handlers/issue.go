@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 
 	"github.com/vault-msp/httpreq"
+	config"github.com/vault-msp/config"
 )
 
 //Cert for req Params obj
@@ -27,6 +28,12 @@ type IssueCertData struct {
 func IssueCert(rw http.ResponseWriter,r *http.Request) {
 
 	cert := Cert{}
+
+	config,err := config.SetConfig()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
@@ -41,7 +48,7 @@ func IssueCert(rw http.ResponseWriter,r *http.Request) {
 
 	vaultData,err := json.Marshal(cert.Data)
 
-	reqObj := httpreq.CreateRequest("POST","http://localhost:8200/v1/"+cert.Path+"/issue/"+cert.Roles,"myroot",vaultData)
+	reqObj := httpreq.CreateRequest("POST","http://"+config.VaultURL+"v1/"+cert.Path+"/issue/"+cert.Roles,config.VaultToken,vaultData)
 		resp, err := reqObj.HTTPCall()
 
 		if err != nil {

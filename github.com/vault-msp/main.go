@@ -7,11 +7,12 @@ import (
 	"github.com/vault-msp/handlers"
 )
 
-// struct defn
 
 func main() {
 
 	router := mux.NewRouter()
+
+	pki := handlers.EnablePKI()
 
 	router.HandleFunc("/pki", handlers.EnablePKI).Methods("POST")
 	router.HandleFunc("/ca",handlers.IssueCA).Methods("POST")

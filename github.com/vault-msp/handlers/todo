@@ -1,15 +1,19 @@
-1. moving client into sepearte package 
-    create request 
-    httpcall
+1. moving client into sepearte package >>>>>>>
+    create request >>>>>>
+    httpcall >>>>>>>>>>>>
 
-2. passing params in req body
-    parsing req body 
-    passing payload to new req
+2. passing params in req body >>>>>>
+    parsing req body          >>>>>>  
+    passing payload to new req>>>>>>
 
-3. writing config file and reading vault config & passing to create request
+3. writing config file and reading vault config & passing to create request   >>>>>>>>>
 
-4. checking the input body payload to be a struct check
+4. checking the input body payload to be a struct check    >>>>>>
 
-5. giving static values to struct values
+5. giving  default static values to struct values
 
 6. common req body struct for all req
+
+7. common errorHandler
+
+8. api should not exit when errored or panic

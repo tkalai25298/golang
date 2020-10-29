@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 
 	"github.com/vault-msp/httpreq"
+	config"github.com/vault-msp/config"
 )
 //Role struct for creating role request obj
 type Role struct{
@@ -36,6 +37,11 @@ func CreateRole(rw http.ResponseWriter, r *http.Request) {
 
 	role := Role{}
 
+	config,err := config.SetConfig()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
@@ -50,7 +56,7 @@ func CreateRole(rw http.ResponseWriter, r *http.Request) {
 
 	vaultData,err := json.Marshal(role.Data)
 
-	reqObj := httpreq.CreateRequest("POST","http://localhost:8200/v1/"+role.Path+"/roles/"+role.Roles,"myroot",vaultData)
+	reqObj := httpreq.CreateRequest("POST","http://"+config.VaultURL+"v1/"+role.Path+"/roles/"+role.Roles,config.VaultToken,vaultData)
 		resp, err := reqObj.HTTPCall()
 
 		if err != nil {

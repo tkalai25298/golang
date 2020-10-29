@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 
 	"github.com/vault-msp/httpreq"
+	config"github.com/vault-msp/config"
 )
 
 //Pki struct for request params body
@@ -32,6 +33,11 @@ type Config struct {
 func EnablePKI(rw http.ResponseWriter,r *http.Request){
 	pki := Pki{}
 
+	config,err := config.SetConfig() //getting env variables for vault server
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
@@ -48,7 +54,7 @@ func EnablePKI(rw http.ResponseWriter,r *http.Request){
 	vaultData,err := json.Marshal(pki.Data)
 	log.Printf("%v",vaultData)
 
-		reqObj := httpreq.CreateRequest("POST","http://localhost:8200/v1/sys/mounts/"+pki.Path,"myroot",vaultData)
+		reqObj := httpreq.CreateRequest("POST","http://"+config.VaultURL+"/v1/sys/mounts/"+pki.Path,config.VaultToken,vaultData)
 		resp, err := reqObj.HTTPCall()
 
 		if err != nil {
