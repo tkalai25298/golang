@@ -10,18 +10,9 @@ import (
 	config"github.com/vault-msp/config"
 	data"github.com/vault-msp/data"
 )
-//PKI struct for http.handler
-type PKI struct {
-	l *log.Logger
-}
-
-// NewPKI creates a pki handler for new pki engine with logger
-func NewPKI(l *log.Logger) *PKI {
-	return &PKI{l}
-}
 
 //EnablePKI handler to create a pki engine to store certs
-func (p *PKI) EnablePKI(rw http.ResponseWriter,r *http.Request){
+func EnablePKI(rw http.ResponseWriter,r *http.Request){
 
 	pki := data.Pki{}
 
@@ -44,9 +35,9 @@ func (p *PKI) EnablePKI(rw http.ResponseWriter,r *http.Request){
 	// log.Printf("Received: %+v\n", pki.Data)
 
 	vaultData,err := json.Marshal(pki.Data)
-	p.l.Printf("%s",vaultData)
+	log.Printf("%s",vaultData)
 
-		reqObj := httpreq.CreateRequest("POST","http://"+config.VaultURL+"/v1/sys/mounts/"+pki.Path,config.VaultToken,vaultData)
+		reqObj := httpreq.CreateRequest(http.MethodPost,"http://"+config.VaultURL+"/v1/sys/mounts/"+pki.Path,config.VaultToken,vaultData)
 		resp, err := reqObj.HTTPCall()
 
 		if err != nil {
