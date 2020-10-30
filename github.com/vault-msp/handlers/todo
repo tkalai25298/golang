@@ -17,3 +17,9 @@
 7. common errorHandler
 
 8. api should not exit when errored or panic
+
+9. middlewareValidate for request params (NJ-5)
+
+10. JSON Validator (NJ-6)
+
+11. Check for res.body.Close() in all handlers

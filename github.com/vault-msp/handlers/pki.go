@@ -8,30 +8,22 @@ import (
 
 	"github.com/vault-msp/httpreq"
 	config"github.com/vault-msp/config"
+	data"github.com/vault-msp/data"
 )
-
-//Pki struct for request params body
-type Pki struct {
-	Path string `json:"path"`
-	Data PkiData `json:"data"`
+//PKI struct for http.handler
+type PKI struct {
+	l *log.Logger
 }
 
-//PkiData struct for request params with data to be passed for vault
-type PkiData struct {
-	Type string `json:"type"`
-	Config Config `json:"config"`
-	SealWrap bool `json:"seal_wrap"`
+// NewPKI creates a pki handler for new pki engine with logger
+func NewPKI(l *log.Logger) *PKI {
+	return &PKI{l}
 }
-//Config struct to be passed for Data struct
-type Config struct {
-	MaxLeaseTTL string `json:"max_lease_ttl"`
-	DefaultLeaseTTL string `json:"default_lease_ttl"`
-}
-
 
 //EnablePKI handler to create a pki engine to store certs
-func EnablePKI(rw http.ResponseWriter,r *http.Request){
-	pki := Pki{}
+func (p *PKI) EnablePKI(rw http.ResponseWriter,r *http.Request){
+
+	pki := data.Pki{}
 
 	config,err := config.SetConfig() //getting env variables for vault server
 	if err != nil {
@@ -52,7 +44,7 @@ func EnablePKI(rw http.ResponseWriter,r *http.Request){
 	// log.Printf("Received: %+v\n", pki.Data)
 
 	vaultData,err := json.Marshal(pki.Data)
-	log.Printf("%v",vaultData)
+	p.l.Printf("%s",vaultData)
 
 		reqObj := httpreq.CreateRequest("POST","http://"+config.VaultURL+"/v1/sys/mounts/"+pki.Path,config.VaultToken,vaultData)
 		resp, err := reqObj.HTTPCall()
