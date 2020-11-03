@@ -8,26 +8,14 @@ import (
 
 	"github.com/vault-msp/httpreq"
 	config"github.com/vault-msp/config"
+	data"github.com/vault-msp/data"  //Issue struct
 )
 
-//Cert for req Params obj
-type Cert struct{
-	Path string `json:"path"`
-	Roles string `json:"roles"`
-	Data IssueCertData `json:"data"`
-}
-
-//IssueCertData to pass vault data config to issue certificates by a role
-type IssueCertData struct {
-	CommonName string `json:"common_name"`
-	TTL string `json:"ttl"`
-	AltNames string `json:"alt_names"`
-}
 
 //IssueCert handler to issue certs by a role
 func IssueCert(rw http.ResponseWriter,r *http.Request) {
 
-	cert := Cert{}
+	cert := data.Cert{}
 
 	config,err := config.SetConfig()
 	if err != nil {
@@ -44,6 +32,12 @@ func IssueCert(rw http.ResponseWriter,r *http.Request) {
 
 	if err != nil {
 		log.Fatal("Decoding error: ", err)
+	}
+
+	// err = cert.Validate()
+
+	if err != nil {
+		log.Fatal("json validation error",err)
 	}
 
 	vaultData,err := json.Marshal(cert.Data)

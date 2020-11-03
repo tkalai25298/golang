@@ -8,27 +8,14 @@ import (
 
 	"github.com/vault-msp/httpreq"
 	config"github.com/vault-msp/config"
+	data"github.com/vault-msp/data"  //CA struct
 )
 
-//RootCA struct for request params body
-type RootCA struct{
-	Path string `json:"path"`
-	Data CAData `json:"data"`
-}
-
-//CAData struct for vault data config to create root CA cert
-type CAData struct {
-	CommonName string `json:"common_name"`
-	TTL string `json:"ttl"`
-	KeyType string `json:"key_type"`
-	KeyBits int `json:"key_bits"`
-	Organization string `json:"organization"`
-}
 
 //IssueCA handler to issue root certificate 
 func IssueCA (w http.ResponseWriter,r *http.Request) {
 
-	ca := RootCA{}
+	ca := data.RootCA{}
 
 	config,err := config.SetConfig()
 	if err != nil {
@@ -45,6 +32,13 @@ func IssueCA (w http.ResponseWriter,r *http.Request) {
 	if err != nil {
 		log.Fatal("Decoding error: ", err)
 	}
+
+	err = ca.Validate()
+
+	if err != nil {
+		log.Fatal("json validation error",err)
+	}
+
 
 	vaultData,err := json.Marshal(ca.Data)
 

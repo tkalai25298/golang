@@ -1,53 +1,61 @@
 package handlers
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"encoding/json"
 
+	config "github.com/vault-msp/config"
+	data "github.com/vault-msp/data" //Pki struct
 	"github.com/vault-msp/httpreq"
-	config"github.com/vault-msp/config"
-	data"github.com/vault-msp/data"
 )
 
 //EnablePKI handler to create a pki engine to store certs
-func EnablePKI(rw http.ResponseWriter,r *http.Request){
+func EnablePKI(rw http.ResponseWriter, req *http.Request) {
 
-	pki := data.Pki{}
+	reqData := data.Pki{}
 
-	config,err := config.SetConfig() //getting env variables for vault server
+	config, err := config.SetConfig() //getting env variables for vault server
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := ioutil.ReadAll(req.Body)
 
 	if err != nil {
 		log.Fatal("error reading request body", err)
 	}
-	err = json.Unmarshal(reqBody,&pki)
 
+	err = json.Unmarshal(reqBody, &reqData)
 	if err != nil {
 		log.Fatal("Decoding error: ", err)
 	}
 
-	// log.Printf("Received: %+v\n", pki.Data)
+	
+	err = reqData.Validate()
 
-	vaultData,err := json.Marshal(pki.Data)
-	log.Printf("%s",vaultData)
+	if err != nil {
+		log.Fatal("json validation error",err)
+	}
 
-		reqObj := httpreq.CreateRequest(http.MethodPost,"http://"+config.VaultURL+"/v1/sys/mounts/"+pki.Path,config.VaultToken,vaultData)
-		resp, err := reqObj.HTTPCall()
+	vaultData, err := json.Marshal(reqData.Data)
+	log.Printf("%s", vaultData)
 
-		if err != nil {
-			log.Fatal("could not send request! Server connection issue")
-		}
-		log.Println("The Status Response ==>> ",resp.StatusCode)
+	//Creating the Request body object
+	reqObj := httpreq.CreateRequest(http.MethodPost, "http://"+config.VaultURL+"/v1/sys/mounts/"+reqData.Path, config.VaultToken, vaultData)
+	//Sending http request to vault server
+	resp, err := reqObj.HTTPCall()
 
-		if resp.StatusCode != 204 {
-			log.Panicf("NON 204 STATUS CODE")
-		}
+	if err != nil {
+		log.Fatal("could not send request! Server connection issue")
+	}
+	
+	log.Println("The Status Response ==>> ", resp.StatusCode)
 
-		defer resp.Body.Close()
+	if resp.StatusCode != 204 {
+		log.Panicf("NON 204 STATUS CODE")
+	}
+
+	defer resp.Body.Close()
 }

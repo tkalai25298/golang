@@ -8,34 +8,14 @@ import (
 
 	"github.com/vault-msp/httpreq"
 	config"github.com/vault-msp/config"
+	data"github.com/vault-msp/data"  //Role struct
 )
-//Role struct for creating role request obj
-type Role struct{
-	Path string `json:"path"`
-	Roles string `json:"roles"`
-	Data RoleData `json:"data"`
-}
-//RoleData struct for vault config data to create role
-type RoleData struct{
-	ServerFlag bool `json:"server_flag"`
-	ClientFlag bool `json:"client_flag"`
-	KeyType string `json:"key_type"`
-	KeyBits int `json:"key_bits"`
-	KeyUsage []string `json:"key_usage"`
-	MaxTTL string `json:"max_ttl"`
-	GenerateLease bool `json:"generate_lease"`
-	AllowAnyName bool `json:"allow_any_name"`
-	OU string `json:"ou"`
-	Organization string `json:"organization"`
-	AllowedDomains string `json:"allowed_domains"`
-	AllowSubdomains bool `json:"allow_subdomains"`
-	BasicConstraintsValidForNonCA bool `json:"basic_constraints_valid_for_non_ca"`
-}
+
 
 //CreateRole handler to create a role for issuing certificates
 func CreateRole(rw http.ResponseWriter, r *http.Request) {
 
-	role := Role{}
+	role := data.Role{}
 
 	config,err := config.SetConfig()
 	if err != nil {
@@ -52,6 +32,12 @@ func CreateRole(rw http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Fatal("Decoding error: ", err)
+	}
+
+	err = role.Validate()
+
+	if err != nil {
+		log.Fatal("json validation error",err)
 	}
 
 	vaultData,err := json.Marshal(role.Data)
