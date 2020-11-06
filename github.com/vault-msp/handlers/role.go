@@ -6,21 +6,17 @@ import (
 	"io/ioutil"
 	"encoding/json"
 
-	"github.com/vault-msp/httpreq"
-	config"github.com/vault-msp/config"
+	// "github.com/vault-msp/httpreq"
+	// config"github.com/vault-msp/config"
 	data"github.com/vault-msp/data"  //Role struct
 )
 
 
 //CreateRole handler to create a role for issuing certificates
-func CreateRole(rw http.ResponseWriter, r *http.Request) {
+func (enable *Enable) CreateRole(rw http.ResponseWriter, r *http.Request) {
 
 	role := data.Role{}
 
-	config,err := config.SetConfig()
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 
@@ -42,8 +38,8 @@ func CreateRole(rw http.ResponseWriter, r *http.Request) {
 
 	vaultData,err := json.Marshal(role.Data)
 
-	reqObj := httpreq.CreateRequest("POST","http://"+config.VaultURL+"v1/"+role.Path+"/roles/"+role.Roles,config.VaultToken,vaultData)
-		resp, err := reqObj.HTTPCall()
+	resp, err := enable.requestObject.HTTPCall("/v1/"+role.Path+"/roles/"+role.Roles,vaultData)
+
 
 		if err != nil {
 			log.Fatal("could not send request! Server connection issue")

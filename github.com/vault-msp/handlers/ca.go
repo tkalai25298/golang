@@ -6,21 +6,16 @@ import (
 	"io/ioutil"
 	"encoding/json"
 
-	"github.com/vault-msp/httpreq"
-	config"github.com/vault-msp/config"
+	// "github.com/vault-msp/httpreq"
 	data"github.com/vault-msp/data"  //CA struct
 )
 
 
 //IssueCA handler to issue root certificate 
-func IssueCA (w http.ResponseWriter,r *http.Request) {
+func (enable *Enable) IssueCA (w http.ResponseWriter,r *http.Request) {
 
 	ca := data.RootCA{}
 
-	config,err := config.SetConfig()
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 
@@ -42,8 +37,7 @@ func IssueCA (w http.ResponseWriter,r *http.Request) {
 
 	vaultData,err := json.Marshal(ca.Data)
 
-	reqObj := httpreq.CreateRequest("POST","http://"+config.VaultURL+"/v1/"+ca.Path+"/root/generate/internal",config.VaultToken,vaultData)
-		resp, err := reqObj.HTTPCall()
+	resp, err := enable.requestObject.HTTPCall("/v1/"+ca.Path+"/root/generate/internal",vaultData)
 
 		if err != nil {
 			log.Fatal("could not send request! Server connection issue")

@@ -6,20 +6,24 @@ import (
 	"log"
 	"net/http"
 
-	config "github.com/vault-msp/config"
 	data "github.com/vault-msp/data" //Pki struct
 	"github.com/vault-msp/httpreq"
 )
 
+//Enable to create httpClient request object
+type Enable struct{
+	l *log.Logger
+	requestObject httpreq.HTTPClient
+}
+//NewPKI that returns requestObject
+func NewPKI(l *log.Logger,req httpreq.HTTPClient) *Enable{
+	return &Enable{l:l,requestObject:req}
+}
+
 //EnablePKI handler to create a pki engine to store certs
-func EnablePKI(rw http.ResponseWriter, req *http.Request) {
+func (enable *Enable) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 
 	reqData := data.Pki{}
-
-	config, err := config.SetConfig() //getting env variables for vault server
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
 
 	reqBody, err := ioutil.ReadAll(req.Body)
 
@@ -40,12 +44,9 @@ func EnablePKI(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	vaultData, err := json.Marshal(reqData.Data)
-	log.Printf("%s", vaultData)
 
-	//Creating the Request body object
-	reqObj := httpreq.CreateRequest(http.MethodPost, "http://"+config.VaultURL+"/v1/sys/mounts/"+reqData.Path, config.VaultToken, vaultData)
 	//Sending http request to vault server
-	resp, err := reqObj.HTTPCall()
+	resp, err := enable.requestObject.HTTPCall("/v1/sys/mounts/"+reqData.Path,vaultData)
 
 	if err != nil {
 		log.Fatal("could not send request! Server connection issue")

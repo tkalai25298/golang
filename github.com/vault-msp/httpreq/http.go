@@ -1,40 +1,63 @@
 package httpreq
 
 import (
-	// "net/url"
+	"net/url"
 	"net/http"
 	"bytes"
+	"io/ioutil"
+	// "log"
 )
 
 //Request object to make http request
 type Request struct {
-	Method string 
-	URL string
-	Token string
-	Data []byte
+	RequestObj *http.Request
+	Client HTTPDo
 }
 
-//CreateRequest fn to create the Request Object for HTTPCall()
-func CreateRequest (method string,url string, token string,data []byte) (req *Request) {
-	reqObj := Request{}
-	reqObj.Method = method
-	reqObj.URL = url
-	reqObj.Token = token
-	reqObj.Data = data
-	
-	return &reqObj
 
+// HTTPDo interface for Client.Do 
+type HTTPDo interface {	
+	Do(req *http.Request) (*http.Response, error)
+} 
+
+//HTTPClient interface for HTTPCall
+type HTTPClient interface {	
+	HTTPCall(path string, data []byte) (*http.Response, error)
+} 
+
+//CreateRequest fn to create the Request Object for HTTPCall()
+func CreateRequest (method string,url *url.URL, token string) *Request {
+
+	client := &http.Client{}
+	
+	reqObj := &http.Request{
+		Method : method,
+		URL : url,
+		Header : map[string][]string {
+			"X-Vault-Token" : {token},
+			},
+	}
+	
+	RequestObject := Request{
+		RequestObj : reqObj,
+		Client : client,
+	}
+
+	return &RequestObject
 }
 
 //HTTPCall to create client request to endpoint
-func (req *Request) HTTPCall() (*http.Response,error) {
+func (req *Request) HTTPCall(path string, data []byte) (*http.Response,error) {
 
-	client := &http.Client{}
+	request := req.RequestObj
 
-	res, err := http.NewRequest(req.Method,req.URL,bytes.NewBuffer(req.Data))
-	res.Header.Add("X-Vault-Token",req.Token)
+	request.URL.Path = path
 
-	resp, err := client.Do(res)
+	requestBody := ioutil.NopCloser(bytes.NewReader([]byte(data)))
+	request.Body = requestBody
 
-	return resp,err
+
+	response,err := req.Client.Do(request)
+
+	return response,err
 } 
