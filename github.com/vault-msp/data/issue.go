@@ -1,52 +1,36 @@
 package data
 
+import (
+	"github.com/go-playground/validator"
+)
+
 //Cert for req Params obj
 type Cert struct{
-	Path string `json:"path"`
-	Roles string `json:"roles"`
+	Path string `json:"path" validate:"required"`
+	Roles string `json:"roles" validate:"required"`
 	Data IssueCertData `json:"data"`
 }
 
 //IssueCertData to pass vault data config to issue certificates by a role
 type IssueCertData struct {
-	CommonName string `json:"common_name"`
+	CommonName string `json:"common_name" validate:"required"`
 	TTL string `json:"ttl"`
 	AltNames string `json:"alt_names"`
 }
 
 
-// //Validate for Role struct json validation
-// func (role *Role) Validate() error {
-// 	role.SetDefaultValues()
+//Validate for Role struct json validation
+func (cert *Cert) Validate() error {
+	cert.SetDefaultValues()
 
-// 	validate := validator.New()
-// 	return validate.Struct(role)
-// }	
+	validate := validator.New()
+	return validate.Struct(cert)
+}	
 
-// //SetDefaultValues to assign missing values to be passed for vault server
-// func (role *Role) SetDefaultValues() {
-// 	if role.Data.KeyType == "" {
-// 		role.Data.KeyType = "ec"
-// 	}	
+//SetDefaultValues to assign missing values to be passed for vault server
+func (cert *Cert) SetDefaultValues() {
+	if cert.Data.TTL == "" {
+		cert.Data.TTL = "2400h"
+	}
 
-// 	if role.Data.KeyBits == 0 {
-// 		role.Data.KeyBits = 256
-// 	}
-
-// 	if role.Data.KeyUsage == "" {
-// 		role.Data.KeyUsage = ["DigitalSignature"]
-// 	}
-
-// 	if role.Data.MaxTTL == "" {
-// 		role.Data.MaxTTL = "3000h"
-// 	}
-
-// 	if role.Data.GenerateLease == false {
-// 		role.Data.GenerateLease = true
-// 	}
-
-// 	if role.Data.BasicConstraintsValidForNonCA == false {
-// 		role.Data.BasicConstraintsValidForNonCA = true
-// 	}
-
-// }
+}

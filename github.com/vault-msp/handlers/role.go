@@ -6,14 +6,12 @@ import (
 	"io/ioutil"
 	"encoding/json"
 
-	// "github.com/vault-msp/httpreq"
-	// config"github.com/vault-msp/config"
 	data"github.com/vault-msp/data"  //Role struct
 )
 
 
 //CreateRole handler to create a role for issuing certificates
-func (enable *Enable) CreateRole(rw http.ResponseWriter, r *http.Request) {
+func (vault *Vault) CreateRole(rw http.ResponseWriter, r *http.Request) {
 
 	role := data.Role{}
 
@@ -21,33 +19,42 @@ func (enable *Enable) CreateRole(rw http.ResponseWriter, r *http.Request) {
 	reqBody, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
-		log.Fatal("error reading request body", err)
+		log.Println("[ERROR] Reading request body: ", err)
+		http.Error(rw, "Error Reading Request body", http.StatusBadRequest)
+		return
 	}
 
 	err = json.Unmarshal(reqBody,&role)
 
 	if err != nil {
-		log.Fatal("Decoding error: ", err)
+		log.Println("[ERROR] Decoding Request body:  ", err)
+		http.Error(rw, "Error Decoding Request body  ", http.StatusBadRequest)
+		return
 	}
 
 	err = role.Validate()
 
 	if err != nil {
-		log.Fatal("json validation error",err)
+		log.Println("[ERROR] Request Json validation  ", err)
+		http.Error(rw, "Error Request Json validation ", http.StatusBadRequest)
+		return
 	}
 
 	vaultData,err := json.Marshal(role.Data)
 
-	resp, err := enable.requestObject.HTTPCall("/v1/"+role.Path+"/roles/"+role.Roles,vaultData)
-
+	resp, err := vault.requestObject.HTTPCall("/v1/"+role.Path+"/roles/"+role.Roles,vaultData)
 
 		if err != nil {
-			log.Fatal("could not send request! Server connection issue")
+			log.Println("[ERROR] Could not send request! Server connection issue ", err)
+			http.Error(rw, "Error Unbale to send Vault Server Request ", http.StatusBadGateway)
+			return
 		}
 		log.Println("The Status Response ==>> ",resp.StatusCode)
 
 		if resp.StatusCode != 204 {
-			log.Panicf("NON 204 STATUS CODE")
+			log.Println("[ERROR] Non 200 Status Code ", err)
+			http.Error(rw, "Error Non 200 Status Code ", http.StatusBadGateway)
+			return
 		}
 
 		defer resp.Body.Close()

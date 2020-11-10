@@ -13,13 +13,14 @@ type Pki struct {
 //PkiData struct for request params with data to be passed for vault
 type PkiData struct {
 	Type   string `json:"type"`
-
-	Config struct {
-		MaxLeaseTTL     string `json:"max_lease_ttl"`
-		DefaultLeaseTTL string `json:"default_lease_ttl"`
-	} `json:"config"`
-
+	Config Config `json:"config"`
 	SealWrap bool `json:"seal_wrap"`
+}
+
+//Config for Pki vault config
+type Config struct {
+	MaxLeaseTTL     string `json:"max_lease_ttl"`
+	DefaultLeaseTTL string `json:"default_lease_ttl"`
 }
 
 

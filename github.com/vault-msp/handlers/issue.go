@@ -6,47 +6,54 @@ import (
 	"net/http"
 	"encoding/json"
 
-	// "github.com/vault-msp/httpreq"
-	// config"github.com/vault-msp/config"
 	data"github.com/vault-msp/data"  //Issue struct
 )
 
 
 //IssueCert handler to issue certs by a role
-func (enable *Enable) IssueCert(rw http.ResponseWriter,r *http.Request) {
+func (vault *Vault) IssueCert(rw http.ResponseWriter,r *http.Request) {
 
 	cert := data.Cert{}
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
-		log.Fatal("error reading request body", err)
+		log.Println("[ERROR] Reading request body: ", err)
+		http.Error(rw, "Error Reading Request body", http.StatusBadRequest)
+		return
 	}
 	
 	err = json.Unmarshal(reqBody,&cert)
 
 	if err != nil {
-		log.Fatal("Decoding error: ", err)
+		log.Println("[ERROR] Decoding Request body:  ", err)
+		http.Error(rw, "Error Decoding Request body  ", http.StatusBadRequest)
+		return
 	}
 
-	// err = cert.Validate()
+	err = cert.Validate()
 
 	if err != nil {
-		log.Fatal("json validation error",err)
+		log.Println("[ERROR] Request Json validation  ", err)
+		http.Error(rw, "Error Request Json validation ", http.StatusBadRequest)
+		return
 	}
 
 	vaultData,err := json.Marshal(cert.Data)
-	
 
-	resp, err := enable.requestObject.HTTPCall("/v1/"+cert.Path+"/issue/"+cert.Roles,vaultData)
+	resp, err := vault.requestObject.HTTPCall("/v1/"+cert.Path+"/issue/"+cert.Roles,vaultData)
 
 		if err != nil {
-			log.Fatal("could not send request! Server connection issue")
+			log.Println("[ERROR] Could not send request! Server connection issue ", err)
+			http.Error(rw, "Error Unbale to send Vault Server Request ", http.StatusBadGateway)
+			return
 		}
 		log.Println("The Status Response ==>> ",resp.StatusCode)
 
 		if resp.StatusCode != 200 {
-			log.Panicf("NON 200 STATUS CODE")
+			log.Println("[ERROR] Non 200 Status Code ", err)
+			http.Error(rw, "Error Non 200 Status Code ", http.StatusBadGateway)
+			return
 		}
 
 		defer resp.Body.Close()

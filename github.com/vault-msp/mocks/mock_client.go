@@ -1,14 +1,22 @@
-package test
+package mocks
 
-import "net/http"
+import (
+	"net/http"
+)
 
-// MockClient is the mock client for HTTPClient interface
-type MockClient struct {
-	DoFunc func(req *http.Request) (*http.Response, error)
+
+type MockHTTPDo struct{
+	DoFunc func( *http.Request) (*http.Response, error)
 }
 
+func (m *MockHTTPDo) Do(req *http.Request) (*http.Response, error){
+	return m.DoFunc(req)
+}
 
-// Do is the mock client's `Do` func for HTTPClient interface
-func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
-		return m.DoFunc(req)
+type MockHTTPCall struct{
+	CallFunc func (string, []byte) (*http.Response, error)
+}
+
+func(m *MockHTTPCall) HTTPCall(path string, data []byte) (*http.Response, error){
+	return m.CallFunc(path,data)
 }

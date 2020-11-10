@@ -5,27 +5,25 @@ import (
 	"net/http"
 	"bytes"
 	"io/ioutil"
-	// "log"
 )
 
-//Request object to make http request
+//Request object to make http request for vault server
 type Request struct {
-	RequestObj *http.Request
-	Client HTTPDo
+	RequestObj *http.Request	//Request Object
+	Client HTTPDo	
 }
-
 
 // HTTPDo interface for Client.Do 
 type HTTPDo interface {	
 	Do(req *http.Request) (*http.Response, error)
 } 
 
-//HTTPClient interface for HTTPCall
+//HTTPClient interface for HTTPCall to vault server
 type HTTPClient interface {	
 	HTTPCall(path string, data []byte) (*http.Response, error)
 } 
 
-//CreateRequest fn to create the Request Object for HTTPCall()
+//CreateRequest to create the Request Object for HTTPCall()
 func CreateRequest (method string,url *url.URL, token string) *Request {
 
 	client := &http.Client{}
@@ -46,7 +44,7 @@ func CreateRequest (method string,url *url.URL, token string) *Request {
 	return &RequestObject
 }
 
-//HTTPCall to create client request to endpoint
+//HTTPCall to create client request to vault endpoint
 func (req *Request) HTTPCall(path string, data []byte) (*http.Response,error) {
 
 	request := req.RequestObj
