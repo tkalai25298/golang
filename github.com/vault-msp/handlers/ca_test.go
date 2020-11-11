@@ -13,34 +13,40 @@ import (
 )
 
 
-func TestPki(t *testing.T) {
+func TestCA(t *testing.T) {
 	tt := []struct{
 		name string
-		Pki data.Pki
+		CA data.RootCA
 		statusCode int	//statusResponse for Vault server
 		statusResponse int	//statusResponse of Pki handler
 		err string 
 	}{
-		{	name: "Valid Pki Request body & StatusOK",
-			Pki : data.Pki{ Path:"sampleCA",},
+		{	name: "Valid RootCA Request body & StatusOK",
+			CA : data.RootCA{ Path:"sampleCA",
+							  Data:data.CAData{CommonName:"sampleCA",Organization:"sample"},
+							},
 			statusCode : 204,	
 			statusResponse : 200,
 		},
 		{
-			name: "valid Pki request body & StatusBadRequest",
-			Pki : data.Pki{ Path:"sampleCA",},
+			name: "valid RootCA request body & StatusBadRequest",
+			CA : data.RootCA{ Path:"sampleCA",
+							  Data:data.CAData{CommonName:"sampleCA",Organization:"sample"},
+							},
 			statusCode : 400,
 			statusResponse : 502,
 		},
 		{
-			name:"Invalid Pki Request body",
-			Pki : data.Pki{},
+			name:"Invalid RootCA Request body",
+			CA : data.RootCA{Path:"sampleCA",},
 			statusCode:400,
 			statusResponse : 400,
 		},
 		{
 			name: "http New Request error",
-			Pki : data.Pki{ Path:"sampleCA",},
+			CA : data.RootCA{ Path:"sampleCA",
+							  Data:data.CAData{CommonName:"sampleCA",Organization:"sample"},
+							},
 			err : "Could not create http New Request Object",
 			statusResponse : 502,
 		},
@@ -48,7 +54,7 @@ func TestPki(t *testing.T) {
 
 	for _,tc := range tt{
 		t.Run(tc.name, func(t *testing.T) {
-			l := log.New(os.Stdout,"pki-test",log.LstdFlags)
+			l := log.New(os.Stdout,"Root CA-test",log.LstdFlags)
 
 			mock := &mocks.MockHTTPCall{}
 			mock.CallFunc = func(path string, data []byte) (*http.Response, error){
@@ -61,14 +67,14 @@ func TestPki(t *testing.T) {
 				requestObject: mock,
 				l: l,
 			}
-			pki := tc.Pki
+			CA := tc.CA
 
-			err := pki.Validate()
+			err := CA.Validate()
 
-			reqBody,err := json.Marshal(pki)
-			if err != nil { t.Errorf("[Error] Marshal of pki struct failed!")}
+			reqBody,err := json.Marshal(CA)
+			if err != nil { t.Errorf("[Error] Marshal of CA struct failed!")}
 
-			serverRes, err := http.NewRequest("POST","http://localhost:8000/pki",bytes.NewReader(reqBody))
+			serverRes, err := http.NewRequest("POST","http://localhost:8000/ca",bytes.NewReader(reqBody))
 
 			if err!= nil {
 				t.Fatalf("could not send request: %v",err)
@@ -81,7 +87,7 @@ func TestPki(t *testing.T) {
 				
 			writer := httptest.NewRecorder()
 
-			req.EnablePKI(writer,serverRes)
+			req.IssueCA(writer,serverRes)
 
 			result :=  writer.Result()
 

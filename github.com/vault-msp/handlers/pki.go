@@ -9,8 +9,6 @@ import (
 	data "github.com/vault-msp/data" //Pki struct
 )
 
-
-
 //EnablePKI handler to create a pki engine to store certs
 func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 
@@ -59,5 +57,4 @@ func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	defer resp.Body.Close()
 }
