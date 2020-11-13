@@ -11,12 +11,11 @@ import (
 
 
 //IssueCA handler to issue root certificate 
-func (vault *Vault) IssueCA (rw http.ResponseWriter,r *http.Request) {
-
+func (vault *Vault) IssueCA (rw http.ResponseWriter,req *http.Request) {
+	defer req.Body.Close()
 	ca := data.RootCA{}
 
-
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := ioutil.ReadAll(req.Body)
 
 	if err != nil {
 		log.Println("[ERROR] Reading request body: ", err)
@@ -43,6 +42,8 @@ func (vault *Vault) IssueCA (rw http.ResponseWriter,r *http.Request) {
 	vaultData,err := json.Marshal(ca.Data)
 
 	resp, err := vault.requestObject.HTTPCall("/v1/"+ca.Path+"/root/generate/internal",vaultData)
+
+	vault.l.Println(resp)
 
 		if err != nil {
 			log.Println("[ERROR] Could not send request! Server connection issue ", err)

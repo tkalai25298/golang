@@ -12,7 +12,7 @@ type RootCA struct{
 
 //CAData struct for vault data config to create root CA cert
 type CAData struct {
-	CommonName string `json:"common_name" validate:"required"`
+	CommonName string `json:"common_name"`
 	TTL string `json:"ttl"`
 	KeyType string `json:"key_type"`
 	KeyBits int `json:"key_bits"`

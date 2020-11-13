@@ -11,11 +11,11 @@ import (
 
 
 //IssueCert handler to issue certs by a role
-func (vault *Vault) IssueCert(rw http.ResponseWriter,r *http.Request) {
-
+func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
+	defer req.Body.Close()
 	cert := data.Cert{}
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := ioutil.ReadAll(req.Body)
 
 	if err != nil {
 		log.Println("[ERROR] Reading request body: ", err)

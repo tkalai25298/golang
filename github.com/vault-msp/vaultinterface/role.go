@@ -7,30 +7,30 @@ import (
 	"github.com/vault-msp/data"
 )
 
-//PKI for vaultCompleteInterface httpcall()
-type PKI struct{
-	Data data.Pki
+//Role for vaultCompleteInterface httpcall()
+type Role struct{
+	Data data.Role
 	Request httpreq.HTTPClient
 }
 
-//NewPKI - Creating new PKI object
-func NewPKI( request httpreq.HTTPClient) *PKI{
-	return &PKI{Request: request}
+//NewRole - Creating new Role object
+func NewRole( request httpreq.HTTPClient) *Role{
+	return &Role{Request: request}
 }
 
-//EnablePki to enable pki engine for vaultComplete Interface
-func (p *PKI) EnablePki() *Errors {
-
-	err := p.Data.Validate()
+//CreateRoles to create RootCA cert for vaultComplete Interface
+func (role *Role) CreateRoles() *Errors{
+	
+	err := role.Data.Validate()
 
 	if err != nil {
 		return &Errors{ Message: "Error Request Json validation ", Status: http.StatusBadRequest}
 	}
 
-	vaultData, err := json.Marshal(p.Data.Data)
+	vaultData, err := json.Marshal(role.Data.Data)
 
 	//Sending http request to vault server
-	resp, err := p.Request.HTTPCall("/v1/sys/mounts/"+p.Data.Path,vaultData)
+	resp, err := role.Request.HTTPCall("/v1/"+role.Data.Path+"/roles/"+role.Data.Roles,vaultData)
 
 	if err != nil {
 		return &Errors{ Message: "Error Unbale to send Vault Server Request ", Status: http.StatusBadGateway}

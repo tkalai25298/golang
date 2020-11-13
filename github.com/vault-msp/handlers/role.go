@@ -11,12 +11,12 @@ import (
 
 
 //CreateRole handler to create a role for issuing certificates
-func (vault *Vault) CreateRole(rw http.ResponseWriter, r *http.Request) {
-
+func (vault *Vault) CreateRole(rw http.ResponseWriter, req *http.Request) {
+	defer req.Body.Close()
 	role := data.Role{}
 
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := ioutil.ReadAll(req.Body)
 
 	if err != nil {
 		log.Println("[ERROR] Reading request body: ", err)

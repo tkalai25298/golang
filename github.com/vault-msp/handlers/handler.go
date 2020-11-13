@@ -5,7 +5,6 @@ import (
 	"github.com/vault-msp/httpreq"
 	"log"
 	"net/http"
-	"os"
 )
 
 //Vault to create http request object
@@ -16,9 +15,7 @@ type Vault struct{
 
 
 //NewVaultRequest that returns requestObject
-func NewVaultRequest(URL string,token string) *Vault{
-
-	l := log.New(os.Stdout, "vault-api", log.LstdFlags)  //creating a logger
+func NewVaultRequest(l *log.Logger,URL string,token string) *Vault{
 
 	VaultURL,err := url.Parse(URL)  //parsing URL string to url.URL
 

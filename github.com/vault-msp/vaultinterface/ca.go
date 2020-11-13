@@ -1,42 +1,45 @@
 package vaultinterface
 
 import (
+	"log"
 	"encoding/json"
 	"net/http"
 	"github.com/vault-msp/httpreq"
 	"github.com/vault-msp/data"
 )
 
-//PKI for vaultCompleteInterface httpcall()
-type PKI struct{
-	Data data.Pki
+//RootCA for vaultCompleteInterface httpcall()
+type RootCA struct{
+	Data data.RootCA
 	Request httpreq.HTTPClient
 }
 
-//NewPKI - Creating new PKI object
-func NewPKI( request httpreq.HTTPClient) *PKI{
-	return &PKI{Request: request}
+//NewRootCA - Creating new RootCA object
+func NewRootCA( request httpreq.HTTPClient) *RootCA{
+	return &RootCA{Request: request}
 }
 
-//EnablePki to enable pki engine for vaultComplete Interface
-func (p *PKI) EnablePki() *Errors {
-
-	err := p.Data.Validate()
+//IssueRootCA to create RootCA cert for vaultComplete Interface
+func (ca *RootCA) IssueRootCA() *Errors{
+	
+	err := ca.Data.Validate()
 
 	if err != nil {
 		return &Errors{ Message: "Error Request Json validation ", Status: http.StatusBadRequest}
 	}
 
-	vaultData, err := json.Marshal(p.Data.Data)
+	vaultData, err := json.Marshal(ca.Data.Data)
 
+	
 	//Sending http request to vault server
-	resp, err := p.Request.HTTPCall("/v1/sys/mounts/"+p.Data.Path,vaultData)
+	resp, err := ca.Request.HTTPCall("/v1/"+ca.Data.Path+"/root/generate/internal",vaultData)
 
 	if err != nil {
+		log.Println(err)
 		return &Errors{ Message: "Error Unbale to send Vault Server Request ", Status: http.StatusBadGateway}
 	}
 
-	if resp.StatusCode != 204 {
+	if resp.StatusCode != 200 {
 		return &Errors{ Message: "Error Non 200 Status Code ", Status: http.StatusBadGateway}
 	}
 	return nil
