@@ -28,19 +28,17 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 		http.Error(rw, "Error Decoding Request body  ", http.StatusBadRequest)
 		return
 	}
-	// vault.l.Printf("%+v",reqData)
 
 
 	//seperating the request object to Pki,ca,role,issue request
 	vaultInterface := helpers.SplitRequest(&reqData,vault.requestObject)
 
 	vault.l.Println("===>>>Creating Pki Engine...")
-	executeErr := vaultInterface.Pki.EnablePki()
+	executeErr := vaultInterface.Pki.EnablePKI()
 	if executeErr != nil {
 		vault.l.Println("[ERROR] in PKI: ",executeErr)
 		http.Error(rw,executeErr.Message,executeErr.Status)
 	}
-	vault.l.Print("Created")
 
 	vault.l.Println("===>>>Creating RootCA cert...")
 	executeErr = vaultInterface.CA.IssueRootCA()
@@ -48,7 +46,6 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 		vault.l.Println("[ERROR] in CA: ",executeErr)
 		http.Error(rw,executeErr.Message,executeErr.Status)
 	}
-	vault.l.Print("created")
 
 	vault.l.Println("===>>>Creating Roles to issue the certs...")
 	executeErr = vaultInterface.Roles.CreateRoles()
@@ -56,7 +53,6 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 		vault.l.Println("[ERROR] in Roles: ",executeErr)
 		http.Error(rw,executeErr.Message,executeErr.Status)
 	}
-	vault.l.Print("created")
 
 	vault.l.Println("===>>>Issuing the Certs...")
 	executeErr = vaultInterface.Cert.IssueCert()
@@ -64,7 +60,6 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 		vault.l.Println("[ERROR] in Cert: ",executeErr)
 		http.Error(rw,executeErr.Message,executeErr.Status)
 	}
-	vault.l.Print("Issued")
 	
 	
 }

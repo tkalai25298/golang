@@ -32,6 +32,6 @@ func main() {
 	postRouter.HandleFunc("/issueCert", VaultRequest.IssueCert)
 	postRouter.HandleFunc("/msp",VaultRequest.VaultInterface)
 
-	log.Fatal(http.ListenAndServe(":8000", router))
+	log.Fatal(http.ListenAndServe(":3000", router))
 	
 }
