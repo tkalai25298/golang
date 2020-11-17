@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/vault-msp/handlers"
+	gohandlers"github.com/vault-msp/handlers"
 	config"github.com/vault-msp/config"
 )
 
@@ -20,7 +20,7 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	VaultRequest := handlers.NewVaultRequest(l,config.VaultURL,config.VaultToken)	//handler for vault server object
+	VaultRequest := gohandlers.NewVaultRequest(l,config.VaultURL,config.VaultToken)	//handler for vault server object
 
 	router := mux.NewRouter() //Gorilla mux router
 
@@ -32,6 +32,17 @@ func main() {
 	postRouter.HandleFunc("/issueCert", VaultRequest.IssueCert)
 	postRouter.HandleFunc("/msp",VaultRequest.VaultInterface)
 
-	log.Fatal(http.ListenAndServe(":3000", router))
-	
+	getRouter := router.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/health",gohandlers.HealthCheck)
+
+	//CORS
+	// origins := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
+
+	port := os.Getenv("PORT")
+	log.Println("Server running on port",port)
+	err = http.ListenAndServe(":"+port, router)
+
+	if err != nil {
+        log.Fatal("ListenAndServe: ", err)
+	}
 }

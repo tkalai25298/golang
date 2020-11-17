@@ -60,6 +60,5 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 		vault.l.Println("[ERROR] in Cert: ",executeErr)
 		http.Error(rw,executeErr.Message,executeErr.Status)
 	}
-	
-	
+		
 }
