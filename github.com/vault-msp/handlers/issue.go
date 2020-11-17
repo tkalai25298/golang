@@ -41,6 +41,7 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 
 	vaultData,err := json.Marshal(cert.Data)
 
+
 	resp, err := vault.requestObject.HTTPCall("/v1/"+cert.Path+"/issue/"+cert.Roles,vaultData)
 
 		if err != nil {
@@ -56,5 +57,6 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 			return
 		}
 
-		defer resp.Body.Close()
+	defer resp.Body.Close()
+	
 }

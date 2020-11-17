@@ -4,15 +4,16 @@ import (
 	"github.com/go-playground/validator"
 )
 
-
-//Role struct for creating role request obj
+//Role for creating a role request obj
 type Role struct{
-	Path string `json:"path" validate:"required"`
-	Roles string `json:"roles" validate:"required"`
+	Path string `json:"path" validate:"required" `
+	Roles []string `json:"roles" validate:"required" `
 	Data RoleData `json:"data"`
 }
+
+
 //RoleData struct for vault config data to create role
-type RoleData struct{
+type RoleData struct {
 	ServerFlag bool `json:"server_flag"`
 	ClientFlag bool `json:"client_flag"`
 	KeyType string `json:"key_type"`
@@ -20,10 +21,11 @@ type RoleData struct{
 	KeyUsage []string `json:"key_usage"`
 	MaxTTL string `json:"max_ttl"` 
 	GenerateLease bool `json:"generate_lease"`
-	AllowAnyName bool `json:"allow_any_name" validate:"required"`
-	OU string `json:"ou" validate:"required"`
+	AllowAnyName bool `json:"allow_any_name" `
+	OU string `json:"ou"`
 	Organization string `json:"organization" validate:"required"`
-	AllowedDomains string `json:"allowed_domains" validate:"required"`
+	AllowLocalhost string `json:"allow_localhost" `
+	AllowedDomains string `json:"allowed_domains"`
 	AllowSubdomains bool `json:"allow_subdomains" validate:"required"`
 	BasicConstraintsValidForNonCA bool `json:"basic_constraints_valid_for_non_ca"`
 }
@@ -35,8 +37,19 @@ func (role *Role) Validate() error {
 	role.SetDefaultValues()
 
 	validate := validator.New()
+
+	for _,roles := range role.Roles {
+	//validating the role names to be one of the 4types
+	err := validate.Var(roles,"oneof=msp admin orderer peer")
+	if err != nil {
+		return err
+	}
+	}
+	
+	//Validating the Role struct 
 	return validate.Struct(role)
 }	
+	
 
 //SetDefaultValues to assign missing values to be passed for vault server
 func (role *Role) SetDefaultValues() {
@@ -58,6 +71,10 @@ func (role *Role) SetDefaultValues() {
 
 	if role.Data.GenerateLease == false {
 		role.Data.GenerateLease = true
+	}
+
+	if role.Data.AllowedDomains == "" {
+		role.Data.AllowedDomains = "service.consul"
 	}
 
 	if role.Data.BasicConstraintsValidForNonCA == false {

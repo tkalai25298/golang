@@ -29,15 +29,19 @@ func (role *Role) CreateRoles() *Errors{
 
 	vaultData, err := json.Marshal(role.Data.Data)
 
-	//Sending http request to vault server
-	resp, err := role.Request.HTTPCall("/v1/"+role.Data.Path+"/roles/"+role.Data.Roles,vaultData)
+	for _,rolename := range role.Data.Roles {
 
-	if err != nil {
-		return &Errors{ Message: "Error Unbale to send Vault Server Request ", Status: http.StatusBadGateway}
-	}
+		//Sending http request to vault server
+		resp, err := role.Request.HTTPCall("/v1/"+role.Data.Path+"/roles/"+rolename,vaultData)
 
-	if resp.StatusCode != 204 {
-		return &Errors{ Message: "Error Non 200 Status Code ", Status: http.StatusBadGateway}
+		if err != nil {
+			return &Errors{ Message: "Error Unbale to send Vault Server Request ", Status: http.StatusBadGateway}
+		}
+
+		if resp.StatusCode != 204 {
+			return &Errors{ Message: "Error Non 200 Status Code creating the Role", Status: http.StatusBadGateway}
+		}
+		
 	}
 	return nil
 }

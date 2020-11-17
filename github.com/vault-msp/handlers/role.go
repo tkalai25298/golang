@@ -41,8 +41,11 @@ func (vault *Vault) CreateRole(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	vaultData,err := json.Marshal(role.Data)
+	vault.l.Println(vaultData)
 
-	resp, err := vault.requestObject.HTTPCall("/v1/"+role.Path+"/roles/"+role.Roles,vaultData)
+	for _,rolename := range role.Roles{
+
+		resp, err := vault.requestObject.HTTPCall("/v1/"+role.Path+"/roles/"+rolename,vaultData)
 
 		if err != nil {
 			log.Println("[ERROR] Could not send request! Server connection issue ", err)
@@ -58,4 +61,5 @@ func (vault *Vault) CreateRole(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		defer resp.Body.Close()
+	}
 }

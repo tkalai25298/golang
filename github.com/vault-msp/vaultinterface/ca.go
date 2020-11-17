@@ -40,7 +40,7 @@ func (ca *RootCA) IssueRootCA() *Errors{
 	}
 
 	if resp.StatusCode != 200 {
-		return &Errors{ Message: "Error Non 200 Status Code ", Status: http.StatusBadGateway}
+		return &Errors{ Message: "Error Non 200 Status Code for CA ", Status: http.StatusBadGateway}
 	}
 	return nil
 }

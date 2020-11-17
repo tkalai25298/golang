@@ -50,25 +50,3 @@ func (pki *Pki) SetDefaultValues()  {
 	}
 }
 
-
-
-
-//Validate for Pki struct json validation
-// func (pki *Pki) Validate() error {
-// 	validate := validator.New()
-// 	validate.RegisterValidation("type", SetType)
-
-	
-
-// 	return validate.Struct(pki)
-// }
-
-//SetType to set missed default values to be passed for Vault
-// func SetType(fl validator.FieldLevel) bool {
-
-// 	if fl.Field().IsZero() {
-		
-// 		return true
-// 	}
-// 	return false
-// }

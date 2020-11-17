@@ -43,8 +43,6 @@ func (vault *Vault) IssueCA (rw http.ResponseWriter,req *http.Request) {
 
 	resp, err := vault.requestObject.HTTPCall("/v1/"+ca.Path+"/root/generate/internal",vaultData)
 
-	vault.l.Println(resp)
-
 		if err != nil {
 			log.Println("[ERROR] Could not send request! Server connection issue ", err)
 			http.Error(rw, "Error Unbale to send Vault Server Request ", http.StatusBadGateway)

@@ -41,6 +41,10 @@ func (ca *RootCA) SetDefaultValues() {
 	if ca.Data.KeyBits == 0 {
 		ca.Data.KeyBits = 256
 	}
+	
+	if ca.Data.CommonName == "" {
+		ca.Data.CommonName = ca.Data.Organization + "CA"
+	}
 }
 
 

@@ -31,6 +31,6 @@ func TestPki(t *testing.T) {
 	}
 
 	if reqp.StatusCode != 200{
-		t.Fatalf("Did'nt expect 200 but got %d",reqp.StatusCode)
+		t.Fatalf("Expected 200 but got %d",reqp.StatusCode)
 	}
 }

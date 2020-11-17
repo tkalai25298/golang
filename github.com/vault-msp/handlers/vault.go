@@ -65,9 +65,6 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 		http.Error(rw,executeErr.Message,executeErr.Status)
 	}
 	vault.l.Print("Issued")
-
-
-
 	
 	
 }

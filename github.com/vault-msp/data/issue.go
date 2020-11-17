@@ -4,7 +4,7 @@ import (
 	"github.com/go-playground/validator"
 )
 
-//Cert for req Params obj
+//Cert for issue cert by a role
 type Cert struct{
 	Path string `json:"path" validate:"required"`
 	Roles string `json:"roles" validate:"required"`
@@ -13,11 +13,10 @@ type Cert struct{
 
 //IssueCertData to pass vault data config to issue certificates by a role
 type IssueCertData struct {
-	CommonName string `json:"common_name" validate:"required"`
+	CommonName string `json:"common_name"`
 	TTL string `json:"ttl"`
 	AltNames string `json:"alt_names"`
 }
-
 
 //Validate for Role struct json validation
 func (cert *Cert) Validate() error {

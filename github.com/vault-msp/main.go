@@ -30,8 +30,8 @@ func main() {
 	postRouter.HandleFunc("/ca", VaultRequest.IssueCA)
 	postRouter.HandleFunc("/role", VaultRequest.CreateRole)
 	postRouter.HandleFunc("/issueCert", VaultRequest.IssueCert)
-	postRouter.HandleFunc("/vaultInterface",VaultRequest.VaultInterface)
+	postRouter.HandleFunc("/msp",VaultRequest.VaultInterface)
 
-	http.ListenAndServe(":8000", router)
+	log.Fatal(http.ListenAndServe(":8000", router))
 	
 }
