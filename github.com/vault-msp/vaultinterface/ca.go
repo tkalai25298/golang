@@ -1,11 +1,13 @@
 package vaultinterface
 
 import (
-	"log"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
-	"github.com/vault-msp/httpreq"
+
 	"github.com/vault-msp/data"
+	"github.com/vault-msp/httpreq"
 )
 
 //RootCA for vaultCompleteInterface httpcall()
@@ -25,7 +27,7 @@ func (ca *RootCA) IssueRootCA() *Errors{
 	err := ca.Data.Validate()
 
 	if err != nil {
-		return &Errors{ Message: "Error Request Json validation ", Status: http.StatusBadRequest}
+		return &Errors{ Message: fmt.Sprintf("Error Request Json validation: %v",err ), Status: http.StatusBadRequest}
 	}
 
 	vaultData, err := json.Marshal(ca.Data.Data)
@@ -36,11 +38,11 @@ func (ca *RootCA) IssueRootCA() *Errors{
 
 	if err != nil {
 		log.Println(err)
-		return &Errors{ Message: "Error Unbale to send Vault Server Request ", Status: http.StatusBadGateway}
+		return &Errors{ Message: fmt.Sprintf("Error Unbale to send Vault Server Request: %v",err), Status: http.StatusBadGateway}
 	}
 
 	if resp.StatusCode != 200 {
-		return &Errors{ Message: "Error Non 200 Status Code for CA ", Status: http.StatusBadGateway}
+		return &Errors{ Message: fmt.Sprintf("Error Non 200 Status Code for CA got %v",resp.StatusCode), Status: http.StatusBadGateway}
 	}
 	return nil
 }

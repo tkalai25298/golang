@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/vault-msp/data"
-	"github.com/vault-msp/helpers"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/vault-msp/data"
+	"github.com/vault-msp/helpers"
 )
 
 //VaultInterface Handler to create pki,create,role,issue cert
@@ -38,6 +40,7 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 	if executeErr != nil {
 		vault.l.Println("[ERROR] in PKI: ",executeErr)
 		http.Error(rw,executeErr.Message,executeErr.Status)
+		return
 	}
 
 	vault.l.Println("===>>>Creating RootCA cert...")
@@ -45,6 +48,7 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 	if executeErr != nil {
 		vault.l.Println("[ERROR] in CA: ",executeErr)
 		http.Error(rw,executeErr.Message,executeErr.Status)
+		return
 	}
 
 	vault.l.Println("===>>>Creating Roles to issue the certs...")
@@ -52,6 +56,7 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 	if executeErr != nil {
 		vault.l.Println("[ERROR] in Roles: ",executeErr)
 		http.Error(rw,executeErr.Message,executeErr.Status)
+		return
 	}
 
 	vault.l.Println("===>>>Issuing the Certs...")
@@ -59,6 +64,10 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 	if executeErr != nil {
 		vault.l.Println("[ERROR] in Cert: ",executeErr)
 		http.Error(rw,executeErr.Message,executeErr.Status)
+		return
 	}
+
+	fmt.Fprintf(rw,"Creation of PKI,Roles,RootCA,Issue certs Completed! ")
+
 		
 }

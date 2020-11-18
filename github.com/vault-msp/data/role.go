@@ -26,7 +26,7 @@ type RoleData struct {
 	Organization string `json:"organization" validate:"required"`
 	AllowLocalhost string `json:"allow_localhost" `
 	AllowedDomains string `json:"allowed_domains"`
-	AllowSubdomains bool `json:"allow_subdomains" validate:"required"`
+	AllowSubdomains bool `json:"allow_subdomains"`
 	BasicConstraintsValidForNonCA bool `json:"basic_constraints_valid_for_non_ca"`
 }
 
@@ -40,7 +40,7 @@ func (role *Role) Validate() error {
 
 	for _,roles := range role.Roles {
 	//validating the role names to be one of the 4types
-	err := validate.Var(roles,"oneof=msp admin orderer peer")
+	err := validate.Var(roles,"oneof=client admin orderer peer")
 	if err != nil {
 		return err
 	}
@@ -72,6 +72,9 @@ func (role *Role) SetDefaultValues() {
 	if role.Data.GenerateLease == false {
 		role.Data.GenerateLease = true
 	}
+	if role.Data.AllowSubdomains == false {
+		role.Data.AllowSubdomains = true
+	}
 
 	if role.Data.AllowedDomains == "" {
 		role.Data.AllowedDomains = "service.consul"
@@ -80,5 +83,4 @@ func (role *Role) SetDefaultValues() {
 	if role.Data.BasicConstraintsValidForNonCA == false {
 		role.Data.BasicConstraintsValidForNonCA = true
 	}
-
 }

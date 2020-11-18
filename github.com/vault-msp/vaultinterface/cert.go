@@ -2,6 +2,7 @@ package vaultinterface
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/vault-msp/data"
@@ -25,7 +26,7 @@ func (cert *Cert) IssueCert() *Errors {
 	err := cert.Data.Validate()
 
 	if err != nil {
-		return &Errors{Message: "Error Request Json validation ", Status: http.StatusBadRequest}
+		return &Errors{ Message: fmt.Sprintf("Error Request Json validation: %v",err ), Status: http.StatusBadRequest}
 	}
 
 	vaultData, err := json.Marshal(cert.Data.Data)
@@ -34,11 +35,11 @@ func (cert *Cert) IssueCert() *Errors {
 	resp, err := cert.Request.HTTPCall("/v1/"+cert.Data.Path+"/issue/"+cert.Data.Roles, vaultData)
 
 	if err != nil {
-		return &Errors{Message: "Error Unbale to send Vault Server Request ", Status: http.StatusBadGateway}
+		return &Errors{Message: fmt.Sprintf("Error Unbale to send Vault Server Request: %v",err), Status: http.StatusBadGateway}
 	}
 
 	if resp.StatusCode != 200 {
-		return &Errors{Message: "Error Non 200 Status Code for Issue cert", Status: http.StatusBadGateway}
+		return &Errors{Message: fmt.Sprintf("Error Non 200 Status Code for Issue cert:got %v",resp.StatusCode), Status: http.StatusBadGateway}
 	}
 
 	return nil

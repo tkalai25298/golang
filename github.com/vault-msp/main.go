@@ -37,13 +37,25 @@ func main() {
 	getRouter.HandleFunc("/health",handlers.HealthCheck)
 
 	//CORS
-	origins := gohandlers.CORS(gohandlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")}))
+	// origins := gohandlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
+	// origins := gohandlers.AllowedOrigins([]string{"*"})
+
+	c := gohandlers.CORS(
+		gohandlers.AllowedOrigins([]string{"*"}),
+		gohandlers.AllowedHeaders([]string{"Authorization","Content-Type","Access-Control-Allow-Origin"}),
+		gohandlers.AllowedMethods([]string{"GET","POST"}),
+	)
+  
 
 	port := os.Getenv("PORT")
 	log.Println("Server running on port",port)
-	err = http.ListenAndServe(":"+port, origins(router))
-
-	if err != nil {
-        log.Fatal("ListenAndServe: ", err)
+	server := http.Server{
+		Addr: ":"+port,
+		Handler: c(router),
 	}
+	err = server.ListenAndServe()
+	if err != nil{
+		log.Fatal("Err:" ,err)
+	}
+	
 }

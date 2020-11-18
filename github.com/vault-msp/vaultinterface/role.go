@@ -2,9 +2,11 @@ package vaultinterface
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"github.com/vault-msp/httpreq"
+
 	"github.com/vault-msp/data"
+	"github.com/vault-msp/httpreq"
 )
 
 //Role for vaultCompleteInterface httpcall()
@@ -24,7 +26,7 @@ func (role *Role) CreateRoles() *Errors{
 	err := role.Data.Validate()
 
 	if err != nil {
-		return &Errors{ Message: "Error Request Json validation ", Status: http.StatusBadRequest}
+		return &Errors{ Message: fmt.Sprintf("Error Request Json validation: %v",err ), Status: http.StatusBadRequest}
 	}
 
 	vaultData, err := json.Marshal(role.Data.Data)
@@ -35,11 +37,11 @@ func (role *Role) CreateRoles() *Errors{
 		resp, err := role.Request.HTTPCall("/v1/"+role.Data.Path+"/roles/"+rolename,vaultData)
 
 		if err != nil {
-			return &Errors{ Message: "Error Unbale to send Vault Server Request ", Status: http.StatusBadGateway}
+			return &Errors{ Message: fmt.Sprintf("Error Unbale to send Vault Server Request :%v",err), Status: http.StatusBadGateway}
 		}
 
 		if resp.StatusCode != 204 {
-			return &Errors{ Message: "Error Non 200 Status Code creating the Role", Status: http.StatusBadGateway}
+			return &Errors{ Message: fmt.Sprintf("Error Non 200 Status Code creating the Role:got %v",resp.StatusCode), Status: http.StatusBadGateway}
 		}
 		
 	}
