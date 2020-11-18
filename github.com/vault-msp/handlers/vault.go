@@ -31,7 +31,7 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 
 
 	//seperating the request object to Pki,ca,role,issue request
-	vaultInterface := helpers.SplitRequest(&reqData,vault.requestObject)
+	vaultInterface := helpers.AddRequestObject(&reqData,vault.requestObject)
 
 	vault.l.Println("===>>>Creating Pki Engine...")
 	executeErr := vaultInterface.Pki.EnablePKI()
