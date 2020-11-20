@@ -35,11 +35,9 @@ func main() {
 
 	getRouter := router.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/health",handlers.HealthCheck)
+	getRouter.HandleFunc("/roles",handlers.ListRoles)
 
 	//CORS
-	// origins := gohandlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
-	// origins := gohandlers.AllowedOrigins([]string{"*"})
-
 	c := gohandlers.CORS(
 		gohandlers.AllowedOrigins([]string{"*"}),
 		gohandlers.AllowedHeaders([]string{"Authorization","Content-Type","Access-Control-Allow-Origin"}),

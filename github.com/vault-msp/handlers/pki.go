@@ -42,6 +42,11 @@ func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 	//Sending http request to vault server
 	resp, err := vault.requestObject.HTTPCall("/v1/sys/mounts/"+reqData.Path,vaultData)
 
+	responseBody,err := ioutil.ReadAll(resp.Body)
+
+
+	vault.l.Printf("Response Data: %+v ",string(responseBody))
+	
 	if err != nil {
 		vault.l.Println("[ERROR] Could not send request! Server connection issue ", err)
 		http.Error(rw, "Error Unbale to send Vault Server Request ", http.StatusBadGateway)

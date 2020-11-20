@@ -44,6 +44,11 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 
 	resp, err := vault.requestObject.HTTPCall("/v1/"+cert.Path+"/issue/"+cert.Roles,vaultData)
 
+	responseBody,err := ioutil.ReadAll(resp.Body)
+
+
+	vault.l.Printf("Response Data: %+v ",string(responseBody))
+
 		if err != nil {
 			log.Println("[ERROR] Could not send request! Server connection issue ", err)
 			http.Error(rw, "Error Unbale to send Vault Server Request ", http.StatusBadGateway)
