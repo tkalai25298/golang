@@ -66,6 +66,7 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 		http.Error(rw,executeErr.Message,executeErr.Status)
 		return
 	}
+	vault.l.Println("Completed!")
 
 	fmt.Fprintf(rw,"Creation of PKI,Roles,RootCA,Issue certs Completed! ")
 

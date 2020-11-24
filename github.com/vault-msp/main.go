@@ -32,6 +32,7 @@ func main() {
 	postRouter.HandleFunc("/role", VaultRequest.CreateRole)
 	postRouter.HandleFunc("/issueCert", VaultRequest.IssueCert)
 	postRouter.HandleFunc("/msp",VaultRequest.VaultInterface)
+	postRouter.HandleFunc("/wallet",VaultRequest.Wallet)
 
 	getRouter := router.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/health",handlers.HealthCheck)

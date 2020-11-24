@@ -52,6 +52,7 @@ func (vault *Vault) CreateRole(rw http.ResponseWriter, req *http.Request) {
 			http.Error(rw, "Error Unbale to send Vault Server Request ", http.StatusBadGateway)
 			return
 		}
+
 		log.Println("The Status Response ==>> ",resp.StatusCode)
 
 		if resp.StatusCode != 204 {

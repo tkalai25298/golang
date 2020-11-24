@@ -43,11 +43,8 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 
 
 	resp, err := vault.requestObject.HTTPCall("/v1/"+cert.Path+"/issue/"+cert.Roles,vaultData)
+	defer resp.Body.Close()
 
-	responseBody,err := ioutil.ReadAll(resp.Body)
-
-
-	vault.l.Printf("Response Data: %+v ",string(responseBody))
 
 		if err != nil {
 			log.Println("[ERROR] Could not send request! Server connection issue ", err)
@@ -62,6 +59,6 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 			return
 		}
 
-	defer resp.Body.Close()
+	
 	
 }

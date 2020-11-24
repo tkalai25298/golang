@@ -41,11 +41,11 @@ func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 
 	//Sending http request to vault server
 	resp, err := vault.requestObject.HTTPCall("/v1/sys/mounts/"+reqData.Path,vaultData)
+	// vault.l.Printf("%v",resp)
 
 	responseBody,err := ioutil.ReadAll(resp.Body)
 
-
-	vault.l.Printf("Response Data: %+v ",string(responseBody))
+	vault.l.Printf("Response from vault: %+v ",string(responseBody))
 	
 	if err != nil {
 		vault.l.Println("[ERROR] Could not send request! Server connection issue ", err)
