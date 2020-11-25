@@ -18,13 +18,12 @@ func (vault *Vault) Wallet(rw http.ResponseWriter, req *http.Request) {
 
 	reqBody, err := ioutil.ReadAll(req.Body)
 	
-
 	if err != nil {
 		log.Println("[ERROR] Reading request body: ", err)
 		http.Error(rw, "Error Reading Request body", http.StatusBadRequest)
 		return
 	}
-
+	
 	err = json.Unmarshal(reqBody, &cert)
 
 	if err != nil {
@@ -41,10 +40,19 @@ func (vault *Vault) Wallet(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	pkiPath := cert.Data.Organization + "CA"
 	vaultData, err := json.Marshal(cert.Data)
 	//issue certs
-	res, err := vault.requestObject.HTTPCall("/v1/"+cert.Path+"/issue/"+cert.Roles, vaultData)
+	res, err := vault.requestObject.HTTPCall("/v1/"+pkiPath+"/issue/"+cert.Roles, vaultData)
 	defer res.Body.Close()
+
+	if err != nil {
+		log.Println("[ERROR] Bad request ", err)
+		http.Error(rw, "Error Bad request ", http.StatusBadRequest)
+		return
+	}
+
+	log.Println("The Vault server Status Response ==>> ", res.StatusCode)
 
 	if res.StatusCode != 200 {
 		log.Println("[ERROR] Non 200 Status Code from vault-server ", err)
@@ -52,21 +60,21 @@ func (vault *Vault) Wallet(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Println("The Vault server Status Response ==>> ", res.StatusCode)
-
 	resp, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		log.Println("[ERROR] Reading Response body: ", err)
-		http.Error(rw, "Error Reading Response body", http.StatusBadRequest)
+		log.Println("[ERROR] Reading Vault Response body: ", err)
+		http.Error(rw, "Error Reading Vault Response body", http.StatusBadRequest)
 		return
 	}
-	// vault.l.Printf("%v",string(resp))
+
 	err = json.Unmarshal(resp, &response)
 
-	vault.l.Printf("Response Data: %+v ", response.Data)
+	response.Data.Organization = cert.Data.Organization
 
 	identityRequest,err := json.Marshal(response.Data)
+
+
 	//generating identity
 	result,err := http.Post("http://35.242.187.129:3000/Identity","application/json",bytes.NewBuffer(identityRequest))
 	identityResult,err := ioutil.ReadAll(result.Body)

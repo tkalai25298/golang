@@ -40,12 +40,12 @@ func (vault *Vault) CreateRole(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	pkiPath := role.Data.Organization + "CA"
 	vaultData,err := json.Marshal(role.Data)
-	vault.l.Println(vaultData)
 
 	for _,rolename := range role.Roles{
 
-		resp, err := vault.requestObject.HTTPCall("/v1/"+role.Path+"/roles/"+rolename,vaultData)
+		resp, err := vault.requestObject.HTTPCall("/v1/"+pkiPath+"/roles/"+rolename,vaultData)
 
 		if err != nil {
 			log.Println("[ERROR] Could not send request! Server connection issue ", err)

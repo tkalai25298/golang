@@ -39,10 +39,11 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 		return
 	}
 
+	pkiPath := cert.Data.Organization+"CA"
 	vaultData,err := json.Marshal(cert.Data)
 
 
-	resp, err := vault.requestObject.HTTPCall("/v1/"+cert.Path+"/issue/"+cert.Roles,vaultData)
+	resp, err := vault.requestObject.HTTPCall("/v1/"+pkiPath+"/issue/"+cert.Roles,vaultData)
 	defer resp.Body.Close()
 
 

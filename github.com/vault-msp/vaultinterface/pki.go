@@ -12,7 +12,7 @@ import (
 
 //PKI for vaultCompleteInterface httppkill()
 type PKI struct{
-	Data data.Pki
+	Data data.PkiData
 	Request httpreq.HTTPClient
 }
 
@@ -24,24 +24,29 @@ func NewPKI( request httpreq.HTTPClient) *PKI{
 //EnablePKI to create PKI cert for vaultComplete Interface
 func (pki *PKI) EnablePKI() *Errors{
 	
+	paths := [2]string{"CA","TLSCA"}
 	err := pki.Data.Validate()
 
 	if err != nil {
 		return &Errors{ Message: fmt.Sprintf("Error Request Json validation: %v",err ), Status: http.StatusBadRequest}
 	}
 
-	vaultData, err := json.Marshal(pki.Data.Data)
-	
-	//Sending http request to vault server
-	resp, err := pki.Request.HTTPCall("/v1/sys/mounts/"+pki.Data.Path,vaultData)
+	for _,path := range paths{
 
-	if err != nil {
-		log.Println(err)
-		return &Errors{ Message: fmt.Sprintf("Error Unbale to send Vault Server Request :%v",err), Status: http.StatusBadGateway}
-	}
+		pkiPath := pki.Data.Organization + path
+		vaultData, err := json.Marshal(pki.Data)
+		
+		//Sending http request to vault server
+		resp, err := pki.Request.HTTPCall("/v1/sys/mounts/"+pkiPath,vaultData)
 
-	if resp.StatusCode != 204 {
-		return &Errors{ Message: fmt.Sprintf("Error Non 204 Status Code for pki: got %v",resp.StatusCode), Status: http.StatusBadGateway}
+		if err != nil {
+			log.Println(err)
+			return &Errors{ Message: fmt.Sprintf("Error Unbale to send Vault Server Request :%v",err), Status: http.StatusBadGateway}
+		}
+
+		if resp.StatusCode != 204 {
+			return &Errors{ Message: fmt.Sprintf("Error Non 204 Status Code for pki: got %v",resp.StatusCode), Status: http.StatusBadGateway}
+		}
 	}
 	return nil
 }

@@ -4,14 +4,9 @@ import (
 	"github.com/go-playground/validator"
 )
 
-//Pki struct for request params body
-type Pki struct {
-	Path string `json:"path" validate:"required"`
-	Data PkiData `json:"data"`
-}
-
 //PkiData struct for request params with data to be passed for vault
 type PkiData struct {
+	Organization string `json:"organization" validate:"required"`
 	Type   string `json:"type"`
 	Config Config `json:"config"`
 	SealWrap bool `json:"seal_wrap"`
@@ -25,7 +20,7 @@ type Config struct {
 
 
 //Validate for Pki struct json validation
-func (pki *Pki) Validate() error {
+func (pki *PkiData) Validate() error {
 
 	pki.SetDefaultValues()
 
@@ -35,18 +30,18 @@ func (pki *Pki) Validate() error {
 
 
 //SetDefaultValues to assign missing values to be passed for vault server
-func (pki *Pki) SetDefaultValues()  {
+func (pki *PkiData) SetDefaultValues()  {
 
-	if pki.Data.Type == "" {
-		pki.Data.Type = "pki"
+	if pki.Type == "" {
+		pki.Type = "pki"
 	}
 	
-	if pki.Data.Config.MaxLeaseTTL == "" {
-		pki.Data.Config.MaxLeaseTTL = "87600h"
+	if pki.Config.MaxLeaseTTL == "" {
+		pki.Config.MaxLeaseTTL = "87600h"
 	}
 
-	if pki.Data.SealWrap == false {
-		pki.Data.SealWrap = true
+	if pki.SealWrap == false {
+		pki.SealWrap = true
 	}
 }
 

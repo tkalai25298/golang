@@ -4,24 +4,17 @@ import (
 	"github.com/go-playground/validator"
 )
 
-//RootCA struct for request params body
-type RootCA struct{
-	Path string `json:"path" validate:"required"`
-	Data CAData `json:"data"`
-}
-
-//CAData struct for vault data config to create root CA cert
-type CAData struct {
+//RootCAData struct for request params body
+type RootCAData struct{
+	Organization string `json:"organization" validate:"required"`
 	CommonName string `json:"common_name"`
 	TTL string `json:"ttl"`
 	KeyType string `json:"key_type"`
 	KeyBits int `json:"key_bits"`
-	Organization string `json:"organization" validate:"required"`
 }
 
-
 //Validate for RootCA cert struct json validation
-func (ca *RootCA) Validate() error {
+func (ca *RootCAData) Validate() error {
 	ca.SetDefaultValues()
 
 	validate := validator.New()
@@ -29,21 +22,21 @@ func (ca *RootCA) Validate() error {
 }	
 
 //SetDefaultValues to assign missing values to be passed for vault server
-func (ca *RootCA) SetDefaultValues() {
-	if ca.Data.TTL == "" {
-		ca.Data.TTL = "87600h"
+func (ca *RootCAData) SetDefaultValues() {
+	if ca.TTL == "" {
+		ca.TTL = "87600h"
 	}
 
-	if ca.Data.KeyType == "" {
-		ca.Data.KeyType = "ec"
+	if ca.KeyType == "" {
+		ca.KeyType = "ec"
 	}
 
-	if ca.Data.KeyBits == 0 {
-		ca.Data.KeyBits = 256
+	if ca.KeyBits == 0 {
+		ca.KeyBits = 256
 	}
 	
-	if ca.Data.CommonName == "" {
-		ca.Data.CommonName = ca.Data.Organization + "CA"
+	if ca.CommonName == "" {
+		ca.CommonName = ca.Organization + "CA"
 	}
 }
 

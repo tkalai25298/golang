@@ -22,6 +22,8 @@ func NewRole( request httpreq.HTTPClient) *Role{
 
 //CreateRoles to create RootCA cert for vaultComplete Interface
 func (role *Role) CreateRoles() *Errors{
+
+	paths := [2]string{"CA","TLSCA"}
 	
 	err := role.Data.Validate()
 
@@ -29,21 +31,38 @@ func (role *Role) CreateRoles() *Errors{
 		return &Errors{ Message: fmt.Sprintf("Error Request Json validation: %v",err ), Status: http.StatusBadRequest}
 	}
 
-	vaultData, err := json.Marshal(role.Data.Data)
-
-	for _,rolename := range role.Data.Roles {
-
-		//Sending http request to vault server
-		resp, err := role.Request.HTTPCall("/v1/"+role.Data.Path+"/roles/"+rolename,vaultData)
-
-		if err != nil {
-			return &Errors{ Message: fmt.Sprintf("Error Unbale to send Vault Server Request :%v",err), Status: http.StatusBadGateway}
-		}
-
-		if resp.StatusCode != 204 {
-			return &Errors{ Message: fmt.Sprintf("Error Non 200 Status Code creating the Role:got %v",resp.StatusCode), Status: http.StatusBadGateway}
-		}
+	for _,path := range paths{
+	
+		pkiPath := role.Data.Data.Organization + path
 		
+		if path == "TLSCA" {
+			role.Data.Data.ClientFlag = true
+			role.Data.Data.ServerFlag = true
+		} else {
+			role.Data.Data.ClientFlag = false
+			role.Data.Data.ServerFlag = false
+		}
+
+		vaultData, err := json.Marshal(role.Data.Data)
+
+		if err != nil{
+			return &Errors{ Message: fmt.Sprintf("Error Unable to marshal role data :%v",err), Status: http.StatusBadGateway}
+		}
+
+		for _,rolename := range role.Data.Roles {
+
+			//Sending http request to vault server
+			resp, err := role.Request.HTTPCall("/v1/"+pkiPath+"/roles/"+rolename,vaultData)
+
+			if err != nil {
+				return &Errors{ Message: fmt.Sprintf("Error Unbale to send Vault Server Request :%v",err), Status: http.StatusBadGateway}
+			}
+
+			if resp.StatusCode != 204 {
+				return &Errors{ Message: fmt.Sprintf("Error Non 200 Status Code creating the Role:got %v",resp.StatusCode), Status: http.StatusBadGateway}
+			}
+			
+		}
 	}
 	return nil
 }

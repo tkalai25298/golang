@@ -12,7 +12,7 @@ import (
 
 //RootCA for vaultCompleteInterface httpcall()
 type RootCA struct{
-	Data data.RootCA
+	Data data.RootCAData
 	Request httpreq.HTTPClient
 }
 
@@ -23,6 +23,8 @@ func NewRootCA( request httpreq.HTTPClient) *RootCA{
 
 //IssueRootCA to create RootCA cert for vaultComplete Interface
 func (ca *RootCA) IssueRootCA() *Errors{
+
+	paths := [2]string{"CA","TLSCA"}
 	
 	err := ca.Data.Validate()
 
@@ -30,19 +32,23 @@ func (ca *RootCA) IssueRootCA() *Errors{
 		return &Errors{ Message: fmt.Sprintf("Error Request Json validation: %v",err ), Status: http.StatusBadRequest}
 	}
 
-	vaultData, err := json.Marshal(ca.Data.Data)
+	for _,path := range paths{
 
-	
-	//Sending http request to vault server
-	resp, err := ca.Request.HTTPCall("/v1/"+ca.Data.Path+"/root/generate/internal",vaultData)
+		pkiPath := ca.Data.Organization + path
+		vaultData, err := json.Marshal(ca.Data)
 
-	if err != nil {
-		log.Println(err)
-		return &Errors{ Message: fmt.Sprintf("Error Unbale to send Vault Server Request: %v",err), Status: http.StatusBadGateway}
-	}
+		//Sending http request to vault server
+		resp, err := ca.Request.HTTPCall("/v1/"+pkiPath+"/root/generate/internal",vaultData)
 
-	if resp.StatusCode != 200 {
-		return &Errors{ Message: fmt.Sprintf("Error Non 200 Status Code for CA got %v",resp.StatusCode), Status: http.StatusBadGateway}
+		if err != nil {
+			log.Println(err)
+			return &Errors{ Message: fmt.Sprintf("Error Unbale to send Vault Server Request: %v",err), Status: http.StatusBadGateway}
+		}
+
+		if resp.StatusCode != 200 {
+			return &Errors{ Message: fmt.Sprintf("Error Non 200 Status Code for CA got %v",resp.StatusCode), Status: http.StatusBadGateway}
+		}
 	}
 	return nil
+	
 }

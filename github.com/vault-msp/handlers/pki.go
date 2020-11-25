@@ -11,7 +11,7 @@ import (
 //EnablePKI handler to create a pki engine to store certs
 func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
-	reqData := data.Pki{}
+	pki := data.PkiData{}
 
 	reqBody, err := ioutil.ReadAll(req.Body)
 
@@ -21,7 +21,7 @@ func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = json.Unmarshal(reqBody, &reqData)
+	err = json.Unmarshal(reqBody, &pki)
 	if err != nil {
 		vault.l.Println("[ERROR] Decoding Request body:  ", err)
 		http.Error(rw, "Error Decoding Request body  ", http.StatusBadRequest)
@@ -29,7 +29,7 @@ func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	
-	err = reqData.Validate()
+	err = pki.Validate()
 
 	if err != nil {
 		vault.l.Println("[ERROR] Request Json validation  ", err)
@@ -37,10 +37,11 @@ func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	vaultData, err := json.Marshal(reqData.Data)
+	pkiPath:= pki.Organization+"CA"
+	vaultData, err := json.Marshal(pki)
 
 	//Sending http request to vault server
-	resp, err := vault.requestObject.HTTPCall("/v1/sys/mounts/"+reqData.Path,vaultData)
+	resp, err := vault.requestObject.HTTPCall("/v1/sys/mounts/"+pkiPath,vaultData)
 	// vault.l.Printf("%v",resp)
 
 	responseBody,err := ioutil.ReadAll(resp.Body)

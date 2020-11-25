@@ -6,7 +6,6 @@ import (
 
 //Role for creating a role request obj
 type Role struct{
-	Path string `json:"path" validate:"required" `
 	Roles []string `json:"roles" validate:"required" `
 	Data RoleData `json:"data"`
 }
@@ -14,6 +13,7 @@ type Role struct{
 
 //RoleData struct for vault config data to create role
 type RoleData struct {
+	Organization string `json:"organization" validate:"required"`
 	ServerFlag bool `json:"server_flag"`
 	ClientFlag bool `json:"client_flag"`
 	KeyType string `json:"key_type"`
@@ -23,7 +23,6 @@ type RoleData struct {
 	GenerateLease bool `json:"generate_lease"`
 	AllowAnyName bool `json:"allow_any_name" `
 	OU string `json:"ou"`
-	Organization string `json:"organization" validate:"required"`
 	AllowLocalhost string `json:"allow_localhost" `
 	AllowedDomains string `json:"allowed_domains"`
 	AllowSubdomains bool `json:"allow_subdomains"`

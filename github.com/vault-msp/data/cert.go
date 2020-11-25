@@ -6,13 +6,13 @@ import (
 
 //Cert for issue cert by a role
 type Cert struct{
-	Path string `json:"path" validate:"required"`
 	Roles string `json:"roles" validate:"required"`
 	Data IssueCertData `json:"data"`
 }
 
 //IssueCertData to pass vault data config to issue certificates by a role
 type IssueCertData struct {
+	Organization string `json:"organization" validate:"required"`
 	CommonName string `json:"common_name" validate:"required"`
 	TTL string `json:"ttl"`
 	AltNames string `json:"alt_names"`
@@ -32,5 +32,4 @@ func (cert *Cert) SetDefaultValues() {
 		cert.Data.TTL = "2400h"
 	}
 	cert.Data.CommonName = cert.Data.CommonName + ".service.consul"
-
 }
