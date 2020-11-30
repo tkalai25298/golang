@@ -10,6 +10,9 @@ import (
 
 //EnablePKI handler to create a pki engine to store certs
 func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
+
+	paths := [2]string{"CA","TLSCA"}
+
 	defer req.Body.Close()
 	pki := data.PkiData{}
 
@@ -37,29 +40,38 @@ func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	pkiPath:= pki.Organization+"CA"
-	vaultData, err := json.Marshal(pki)
+	for _,path := range paths{
 
-	//Sending http request to vault server
-	resp, err := vault.requestObject.HTTPCall("/v1/sys/mounts/"+pkiPath,vaultData)
-	// vault.l.Printf("%v",resp)
+		pkiPath:= pki.Organization + path
+		vaultData, err := json.Marshal(pki)
 
-	responseBody,err := ioutil.ReadAll(resp.Body)
+		if err != nil{
+			vault.l.Println("[ERROR] Marshalling pki data ", err)
+			http.Error(rw, "Error Marshalling pki data ", http.StatusBadGateway)
+			return
+		}
 
-	vault.l.Printf("Response from vault: %+v ",string(responseBody))
-	
-	if err != nil {
-		vault.l.Println("[ERROR] Could not send request! Server connection issue ", err)
-		http.Error(rw, "Error Unbale to send Vault Server Request ", http.StatusBadGateway)
-		return
-	}
-	
-	vault.l.Println("The Status Response ==>> ", resp.StatusCode)
+		//Sending http request to vault server
+		resp, err := vault.requestObject.HTTPCall("/v1/sys/mounts/"+pkiPath,vaultData)
+		// vault.l.Printf("%v",resp)
 
-	if resp.StatusCode != 204 {
-		vault.l.Println("[ERROR] Non 200 Status Code ", err)
-		http.Error(rw, "Error Non 200 Status Code ", http.StatusBadGateway)
-		return
+		// responseBody,err := ioutil.ReadAll(resp.Body)
+
+		// vault.l.Printf("Response from vault: %+v ",string(responseBody))
+		
+		if err != nil {
+			vault.l.Println("[ERROR] Could not send request! Server connection issue ", err)
+			http.Error(rw, "Error Unbale to send Vault Server Request ", http.StatusBadGateway)
+			return
+		}
+		
+		vault.l.Println("The Status Response ==>> ", resp.StatusCode)
+
+		if resp.StatusCode != 204 {
+			vault.l.Println("[ERROR] Non 200 Status Code ", err)
+			http.Error(rw, "Error Non 200 Status Code ", http.StatusBadGateway)
+			return
+		}
 	}
 
 }

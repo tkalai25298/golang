@@ -70,5 +70,4 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 
 	fmt.Fprintf(rw,"Creation of PKI,Roles,RootCA,Issue certs Completed! ")
 
-		
 }
