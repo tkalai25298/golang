@@ -68,4 +68,10 @@ func (vault *Vault) IssueCA (rw http.ResponseWriter,req *http.Request) {
 		}
 		defer resp.Body.Close()
 	}
+
+	var data = Response{Response: "RootCA created! "}
+	rw.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(rw).Encode(data)	
+
+
 }

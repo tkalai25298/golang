@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -58,16 +57,10 @@ func (vault *Vault) VaultInterface(rw http.ResponseWriter,req *http.Request) {
 		http.Error(rw,executeErr.Message,executeErr.Status)
 		return
 	}
-
-	vault.l.Println("===>>>Issuing the Certs...")
-	executeErr = vaultInterface.Cert.IssueCert()
-	if executeErr != nil {
-		vault.l.Println("[ERROR] in Cert: ",executeErr)
-		http.Error(rw,executeErr.Message,executeErr.Status)
-		return
-	}
 	vault.l.Println("Completed!")
 
-	fmt.Fprintf(rw,"Creation of PKI,Roles,RootCA,Issue certs Completed! ")
+	var data = Response{Response: "Creation of PKI,Roles,RootCA Completed!  "}
+	rw.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(rw).Encode(data)
 
 }

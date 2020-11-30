@@ -74,4 +74,7 @@ func (vault *Vault) CreateRole(rw http.ResponseWriter, req *http.Request) {
 			defer resp.Body.Close()
 		}
 	}
+	var data = Response{Response: "Roles created! "}
+	rw.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(rw).Encode(data)
 }

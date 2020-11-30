@@ -54,8 +54,9 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 
 		resp, err := vault.requestObject.HTTPCall("/v1/"+pkiPath+"/issue/"+cert.Roles,vaultData)
 		defer resp.Body.Close()
-		Body, err := ioutil.ReadAll(resp.Body)
-		vault.l.Println("response: ",string(Body))
+		
+		// Body, err := ioutil.ReadAll(resp.Body)
+		// vault.l.Println("response: ",string(Body))
 
 		if err != nil {
 			vault.l.Println("[ERROR] Could not send request! Server connection issue ", err)
@@ -69,6 +70,9 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 			http.Error(rw, "Error Non 200 Status Code ", http.StatusBadGateway)
 			return
 		}
-	
 	}
+
+	var data = Response{Response: "Certs issued! "}
+	rw.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(rw).Encode(data)
 }

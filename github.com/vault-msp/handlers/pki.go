@@ -68,10 +68,14 @@ func (vault *Vault) EnablePKI(rw http.ResponseWriter, req *http.Request) {
 		vault.l.Println("The Status Response ==>> ", resp.StatusCode)
 
 		if resp.StatusCode != 204 {
-			vault.l.Println("[ERROR] Non 200 Status Code ", err)
+			vault.l.Println("[ERROR] Non 200 Status Code ", resp.Body)
 			http.Error(rw, "Error Non 200 Status Code ", http.StatusBadGateway)
 			return
 		}
 	}
+
+	var data = Response{Response: "PKI engine created! "}
+	rw.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(rw).Encode(data)
 
 }

@@ -11,7 +11,6 @@ type VaultInterface struct{
 	Pki vaultinterface.PKI
 	CA vaultinterface.RootCA
 	Roles vaultinterface.Role
-	Cert vaultinterface.Cert
 }
 
 
@@ -30,10 +29,6 @@ func AddRequestObject(vault *data.VaultComplete,requestObj httpreq.HTTPClient) *
 	//Role Data
 	vaultInterface.Roles.Data = vault.Roles
 	vaultInterface.Roles.Request = requestObj
-
-	//IssueCert Data
-	vaultInterface.Cert.Data = vault.Certs
-	vaultInterface.Cert.Request = requestObj
 
 	return &vaultInterface
 }

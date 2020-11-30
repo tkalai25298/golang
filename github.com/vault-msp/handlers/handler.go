@@ -7,6 +7,10 @@ import (
 	"net/http"
 )
 
+//Response to frontend
+type Response struct{
+	Response string `json:"response"`
+}
 //Vault to create http request object
 type Vault struct{
 	l *log.Logger

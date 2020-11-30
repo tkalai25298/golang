@@ -98,5 +98,9 @@ func (vault *Vault) Wallet(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
+	
+	var data = Response{Response: "Identity generated ! "}
+	rw.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(rw).Encode(data)
 
 }
