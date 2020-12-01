@@ -46,15 +46,21 @@ func (vault *Vault) Wallet(rw http.ResponseWriter, req *http.Request) {
 
 		pkiPath := cert.Data.Organization + path
 		vaultData, err := json.Marshal(cert.Data)
+
+		if err!= nil {
+			vault.l.Println(err)
+			http.Error(rw, "Error Unbale to marshal data", http.StatusBadRequest)
+		}
+
 		//issue certs
 		res, err := vault.requestObject.HTTPCall("/v1/"+pkiPath+"/issue/"+cert.Roles, vaultData)
-		defer res.Body.Close()
 
 		if err != nil {
 			vault.l.Println("[ERROR] Bad request ", err)
 			http.Error(rw, "Error Bad request ", http.StatusBadRequest)
 			return
 		}
+		defer res.Body.Close()
 
 		vault.l.Println("The Vault server Status Response ==>> ", res.StatusCode)
 
@@ -74,20 +80,37 @@ func (vault *Vault) Wallet(rw http.ResponseWriter, req *http.Request) {
 
 		err = json.Unmarshal(resp, &response)
 
+		if err!= nil {
+			vault.l.Println("[ERROR] Could not Unmarshal response data ", err)
+			http.Error(rw, "Error Unbale to unmarshal response data ", http.StatusBadGateway)
+			return
+		}
+
 		response.Data.Organization = cert.Data.Organization
 
 		identityRequest,err := json.Marshal(response.Data)
 
-
+		if err != nil {
+			vault.l.Println("[ERROR] Could not Marshal the req data", err)
+			http.Error(rw, "Error Unbale to marshal request data", http.StatusBadGateway)
+			return
+		}
 		//generating identity
 		result,err := http.Post("http://35.242.187.129:3000/Identity","application/json",bytes.NewBuffer(identityRequest))
+
+		if err != nil {
+			vault.l.Println("[ERROR] Could not send request! Server connection issue ", err)
+			http.Error(rw, "Error Unbale to send Transaction API Server Request ", http.StatusBadGateway)
+			return
+		}
+
 		identityResult,err := ioutil.ReadAll(result.Body)
 
 		vault.l.Printf("Identity response: %v ",string(identityResult));
 
 		if err != nil {
-			vault.l.Println("[ERROR] Could not send request! Server connection issue ", err)
-			http.Error(rw, "Error Unbale to send Transaction API Server Request ", http.StatusBadGateway)
+			vault.l.Println("[ERROR] Could not read request!  ", err)
+			http.Error(rw, "Error Unbale to read Request ", http.StatusBadGateway)
 			return
 		}
 		vault.l.Println("The Identity Status Response ==>> ", result.StatusCode)
@@ -101,6 +124,12 @@ func (vault *Vault) Wallet(rw http.ResponseWriter, req *http.Request) {
 	
 	var data = Response{Response: "Identity generated ! "}
 	rw.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(rw).Encode(data)
+	
+	err = data.JSONResponse(rw)
+	if err != nil {
+		vault.l.Println("[ERROR] Could not Marshal response json ", err)
+		http.Error(rw, "Error Unbale to marshal response json ", http.StatusBadGateway)
+		return
+	}
 
 }

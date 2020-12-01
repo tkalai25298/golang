@@ -35,6 +35,11 @@ func (pki *PKI) EnablePKI() *Errors{
 
 		pkiPath := pki.Data.Organization + path
 		vaultData, err := json.Marshal(pki.Data)
+
+		if err!= nil {
+			log.Println(err)
+			return &Errors{ Message: fmt.Sprintf("Error Unbale to marshal data: %v",err), Status: http.StatusBadGateway}
+		}
 		
 		//Sending http request to vault server
 		resp, err := pki.Request.HTTPCall("/v1/sys/mounts/"+pkiPath,vaultData)

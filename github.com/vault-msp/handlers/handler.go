@@ -1,16 +1,26 @@
 package handlers
 
 import (
-	"net/url"
-	"github.com/vault-msp/httpreq"
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
+	"net/url"
+
+	"github.com/vault-msp/httpreq"
 )
 
 //Response to frontend
 type Response struct{
 	Response string `json:"response"`
 }
+
+//JSONResponse for Encoding struct to json and write to response writer 
+func (response *Response) JSONResponse (rw io.Writer) error {
+	err := json.NewEncoder(rw)
+	return err.Encode(response)
+}
+
 //Vault to create http request object
 type Vault struct{
 	l *log.Logger

@@ -76,5 +76,11 @@ func (vault *Vault) CreateRole(rw http.ResponseWriter, req *http.Request) {
 	}
 	var data = Response{Response: "Roles created! "}
 	rw.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(rw).Encode(data)
+	
+	err = data.JSONResponse(rw)
+	if err != nil {
+		vault.l.Println("[ERROR] Could not Marshal response json ", err)
+		http.Error(rw, "Error Unbale to marshal response json ", http.StatusBadGateway)
+		return
+	}
 }

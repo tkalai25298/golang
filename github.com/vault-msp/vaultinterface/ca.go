@@ -37,6 +37,11 @@ func (ca *RootCA) IssueRootCA() *Errors{
 		pkiPath := ca.Data.Organization + path
 		vaultData, err := json.Marshal(ca.Data)
 
+		if err!= nil {
+			log.Println(err)
+			return &Errors{ Message: fmt.Sprintf("Error Unbale to marshal data: %v",err), Status: http.StatusBadGateway}
+		}
+
 		//Sending http request to vault server
 		resp, err := ca.Request.HTTPCall("/v1/"+pkiPath+"/root/generate/internal",vaultData)
 

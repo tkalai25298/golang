@@ -40,7 +40,7 @@ func (pki *PkiData) SetDefaultValues()  {
 		pki.Config.MaxLeaseTTL = "87600h"
 	}
 
-	if pki.SealWrap == false {
+	if !pki.SealWrap {
 		pki.SealWrap = true
 	}
 }

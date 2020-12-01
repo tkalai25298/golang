@@ -53,7 +53,7 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 		}
 
 		resp, err := vault.requestObject.HTTPCall("/v1/"+pkiPath+"/issue/"+cert.Roles,vaultData)
-		defer resp.Body.Close()
+		
 		
 		// Body, err := ioutil.ReadAll(resp.Body)
 		// vault.l.Println("response: ",string(Body))
@@ -63,6 +63,7 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 			http.Error(rw, "Error Unbale to send Vault Server Request ", http.StatusBadGateway)
 			return
 		}
+		defer resp.Body.Close()
 		vault.l.Println("The Status Response ==>> ",resp.StatusCode)
 
 		if resp.StatusCode != 200 {
@@ -74,5 +75,11 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 
 	var data = Response{Response: "Certs issued! "}
 	rw.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(rw).Encode(data)
+	err = data.JSONResponse(rw)
+	
+	if err != nil {
+		vault.l.Println("[ERROR] Could not Marshal response json ", err)
+		http.Error(rw, "Error Unbale to marshal response json ", http.StatusBadGateway)
+		return
+	}
 }

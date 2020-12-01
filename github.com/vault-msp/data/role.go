@@ -68,10 +68,10 @@ func (role *Role) SetDefaultValues() {
 		role.Data.MaxTTL = "3000h"
 	}
 
-	if role.Data.GenerateLease == false {
+	if !role.Data.GenerateLease {
 		role.Data.GenerateLease = true
 	}
-	if role.Data.AllowSubdomains == false {
+	if !role.Data.AllowSubdomains {
 		role.Data.AllowSubdomains = true
 	}
 
@@ -79,7 +79,7 @@ func (role *Role) SetDefaultValues() {
 		role.Data.AllowedDomains = "service.consul"
 	}
 
-	if role.Data.BasicConstraintsValidForNonCA == false {
+	if !role.Data.BasicConstraintsValidForNonCA{
 		role.Data.BasicConstraintsValidForNonCA = true
 	}
 }
