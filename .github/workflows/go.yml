@@ -2,9 +2,9 @@ name: Go
 
 on:
   push:
-    branches: [ without-test-files ]
+    branches: [ without-test-files master ]
   pull_request:
-    branches: [ without-test-files ]
+    branches: [ without-test-files master ]
 
 jobs:
 
