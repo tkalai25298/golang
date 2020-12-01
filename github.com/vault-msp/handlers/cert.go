@@ -33,6 +33,8 @@ func (vault *Vault) IssueCert(rw http.ResponseWriter,req *http.Request) {
 		return
 	}
 
+	// vault.l.Println("req params",cert)
+
 	err = cert.Validate()
 
 	if err != nil {
