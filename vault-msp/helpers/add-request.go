@@ -1,9 +1,9 @@
 package helpers
 
 import (
-	vaultinterface"github.com/vault-msp/vaultinterface"
-	httpreq"github.com/vault-msp/httpreq"
-	data"github.com/vault-msp/data"
+	vaultinterface"golang/vault-msp/vaultinterface"
+	httpreq"golang/vault-msp/httpreq"
+	data"golang/vault-msp/data"
 )
 
 //VaultInterface to create pki,ca,role,issue cert

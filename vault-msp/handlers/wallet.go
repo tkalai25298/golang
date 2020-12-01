@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	data "github.com/vault-msp/data" //Issue struct
+	data "golang/vault-msp/data" //Issue struct
 )
 
 //Wallet handler to generate identity using blockchain-tx-api

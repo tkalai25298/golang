@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"encoding/json"
 
-	data"github.com/vault-msp/data"  //Issue struct
+	data"golang/vault-msp/data"  //Issue struct
 )
 
 

@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/vault-msp/data"
-	"github.com/vault-msp/helpers"
+	"golang/vault-msp/data"
+	"golang/vault-msp/helpers"
 )
 
 //VaultInterface Handler to create pki,create,role,issue cert

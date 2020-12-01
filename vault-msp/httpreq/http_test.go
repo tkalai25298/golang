@@ -2,10 +2,10 @@ package httpreq_test
 
 import (
 	"net/url"
-	"github.com/vault-msp/httpreq"
+	"golang/vault-msp/httpreq"
 	"net/http"
 	"testing"
-	"github.com/vault-msp/mocks"
+	"golang/vault-msp/mocks"
 )
 
 func TestPki(t *testing.T) {

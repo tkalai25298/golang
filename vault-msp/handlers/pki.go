@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	data "github.com/vault-msp/data" //Pki struct
+	data "golang/vault-msp/data" //Pki struct
 )
 
 //EnablePKI handler to create a pki engine to store certs

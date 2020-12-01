@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/vault-msp/data"
-	"github.com/vault-msp/httpreq"
+	"golang/vault-msp/data"
+	"golang/vault-msp/httpreq"
 )
 
 //RootCA for vaultCompleteInterface httpcall()

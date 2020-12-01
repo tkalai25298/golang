@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/vault-msp/data"
-	"github.com/vault-msp/httpreq"
+	"golang/vault-msp/data"
+	"golang/vault-msp/httpreq"
 )
 
 //Role for vaultCompleteInterface httpcall()

@@ -7,8 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	gohandlers"github.com/gorilla/handlers"
-	"github.com/vault-msp/handlers"
-	config"github.com/vault-msp/config"
+	"golang/vault-msp/handlers"
+	config"golang/vault-msp/config"
 )
 
 

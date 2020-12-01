@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 
-	data"github.com/vault-msp/data"  //CA struct
+	data"golang/vault-msp/data"  //CA struct
 )
 
 

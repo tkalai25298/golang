@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 
-	data"github.com/vault-msp/data"  //Role struct
+	data"golang/vault-msp/data"  //Role struct
 )
 
 

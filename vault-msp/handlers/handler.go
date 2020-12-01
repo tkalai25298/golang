@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/vault-msp/httpreq"
+	"golang/vault-msp/httpreq"
 )
 
 //Response to frontend
