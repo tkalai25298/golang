@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
-	"time"
+	// "time"
 )
 
 type Fetcher interface {
@@ -18,6 +18,7 @@ type SafeCounter struct {
 }
 
 var c SafeCounter = SafeCounter{v: make(map[string]bool)}
+var wg sync.WaitGroup
 
 func (c *SafeCounter) Inc(key string) (bool){
 	c.mu.Lock()
@@ -39,7 +40,9 @@ func (c *SafeCounter) Inc(key string) (bool){
 func Crawl(url string, depth int, fetcher Fetcher) {
 	// TODO: Fetch URLs in parallel.
 	// TODO: Don't fetch the same URL twice.
-	// This implementation doesn't do either:
+	// This implementation doesn't do either:	
+
+	defer wg.Done()
 	if depth <= 0 {
 		return
 	}
@@ -48,21 +51,31 @@ func Crawl(url string, depth int, fetcher Fetcher) {
 		return
 	}
 	
+	
 	body, urls, err := fetcher.Fetch(url)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	
+
 	fmt.Printf("found: %s %q\n", url, body)
+
+	
 	for _, u := range urls {
+		wg.Add(1)
 		go Crawl(u, depth-1, fetcher)
 	}
+	
+
 	return
 }
 
 func main() {
+	wg.Add(1)
 	Crawl("https://golang.org/", 4, fetcher)
-	time.Sleep(5*time.Second)
+	wg.Wait()
+	// time.Sleep(2*time.Second)
 }
 
 // fakeFetcher is Fetcher that returns canned results.
